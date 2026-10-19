@@ -267,7 +267,7 @@
             </form>
             <div class="bg-slate-50/80 p-2 rounded-xl border border-white text-[8.5px] text-slate-500 text-center flex justify-between items-center px-3">
                 <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Cloud Firebase Aktif</span>
-                <span class="font-mono text-[8px] text-indigo-600 font-bold">Smart Logistics v4.4.9</span>
+                <span class="font-mono text-[8px] text-indigo-600 font-bold">Smart Logistics v4.5.2</span>
             </div>
         </div>
     </div>
@@ -337,7 +337,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-2.5 md:p-4 pb-16 space-y-3">
         <!-- VIEW PETUGAS -->
         <div id="view-petugas" class="tab-view space-y-3">
-            <div class="flex space-x-1.5 bg-white p-1.5 rounded-2xl shadow-sm border border-white/80 sticky top-14 z-30">
+            <div class="flex space-x-1.5 bg-white p-1.5 rounded-2xl shadow-sm border border-white/80 relative z-20">
                 <button onclick="window.switchPetugasTab('input')" id="petugas-tab-input" class="flex-1 py-1.5 px-3 rounded-xl text-[10px] font-bold transition bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md flex items-center justify-center space-x-1.5">
                     <i class="fa-solid fa-box-open"></i><span>Input Paket Baru</span>
                 </button>
@@ -348,21 +348,28 @@
 
             <div id="petugas-content-input" class="petugas-tab-panel space-y-3">
                 <div class="bg-white rounded-3xl p-4 md:p-5 shadow-sm border border-white/80 space-y-3">
-                    <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-200/60 pb-2.5">
+                    <div class="flex flex-wrap justify-between items-center gap-2.5 border-b border-slate-200/60 pb-3">
                         <div class="flex items-center space-x-2.5">
-                            <div class="w-9 h-9 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 flex items-center justify-center text-sm shadow-inner"><i class="fa-solid fa-gift"></i></div>
+                            <div class="w-9 h-9 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 flex items-center justify-center text-sm shadow-inner shrink-0"><i class="fa-solid fa-gift"></i></div>
                             <div>
-                                <h2 class="text-xs font-extrabold text-slate-800">Penerimaan Paket Baru</h2>
-                                <p class="text-[8.5px] text-slate-500">Pilih sumber paket Eksternal / Vendor atau Internal / Antar Ruangan</p>
+                                <h2 class="text-xs font-extrabold text-slate-800">Penerimaan & Input Paket Baru</h2>
+                                <p class="text-[8.5px] text-slate-500">Pilih mode input cepat: Paket Masuk Eksternal (Pos 3) atau Internal (Panggilan Teacher)</p>
                             </div>
                         </div>
-                        <div class="flex bg-slate-100/80 p-1 rounded-xl border border-slate-200/50">
-                            <button type="button" onclick="window.switchSourceType('external')" id="btn-src-ext" class="px-3 py-1 rounded-lg text-[9px] font-bold transition bg-indigo-600 text-white shadow flex items-center space-x-1"><i class="fa-solid fa-truck-fast"></i><span>Eksternal</span></button>
-                            <button type="button" onclick="window.switchSourceType('internal')" id="btn-src-int" class="px-3 py-1 rounded-lg text-[9px] font-bold transition text-slate-600 hover:text-slate-900 flex items-center space-x-1"><i class="fa-solid fa-building"></i><span>Internal</span></button>
-                        </div>
+                        <button type="button" id="btn-back-to-kurir" onclick="window.switchRole('kurir')" class="hidden px-3 py-1.5 rounded-xl text-[9px] font-extrabold bg-sky-600 hover:bg-sky-700 text-white transition items-center space-x-1.5 shadow-sm">
+                            <i class="fa-solid fa-arrow-left"></i><i class="fa-solid fa-motorcycle"></i><span>Ke Daftar Tugas Kurir</span>
+                        </button>
                     </div>
 
                     <form id="package-form" onsubmit="window.handlePreparePackageSummary(event)" class="space-y-3">
+                        <div class="grid grid-cols-2 gap-2 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200/70">
+                            <button type="button" onclick="window.applyInputQuickPreset('pos3')" id="btn-src-ext" class="py-2 px-3 rounded-xl text-[9.5px] font-extrabold transition bg-indigo-600 text-white shadow flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-truck-fast"></i><span>Eksternal / Standby Pos 3</span>
+                            </button>
+                            <button type="button" onclick="window.applyInputQuickPreset('teacher-call')" id="btn-src-int" class="py-2 px-3 rounded-xl text-[9.5px] font-extrabold transition text-slate-600 hover:text-slate-900 flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-headset"></i><span>Internal / Panggilan Teacher</span>
+                            </button>
+                        </div>
                         <div id="source-fields-container" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 p-3 bg-slate-50 rounded-2xl border border-white"></div>
 
                         <div class="p-3 bg-gradient-to-r from-indigo-50/70 via-white/80 to-purple-50/70 rounded-2xl border border-indigo-100/80 flex flex-wrap items-center justify-between gap-2 shadow-sm">
@@ -532,24 +539,46 @@
         </div>
 
         <!-- VIEW KURIR -->
-        <div id="view-kurir" class="tab-view space-y-2">
-            <div class="flex justify-between items-center bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100 sticky top-14 z-30">
-                <div class="grid grid-cols-3 gap-1 flex-1 mr-2">
-                    <button onclick="window.switchCourierSubTab('pending')" id="courier-subtab-pending" class="py-1 px-2 rounded-xl text-[9px] font-bold transition bg-indigo-600 text-white shadow flex items-center justify-center space-x-1">
-                        <i class="fa-solid fa-list-check text-amber-300"></i><span>Antrian (<span id="count-pending-badge">0</span>)</span>
+        <div id="view-kurir" class="tab-view space-y-2.5">
+            <!-- Panel Pintasan Operasional Kurir (Terpisah dari Menu Tab Status agar tidak bentrok) -->
+            <div class="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-100 space-y-2">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-7 h-7 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs shadow-inner"><i class="fa-solid fa-bolt"></i></span>
+                        <div>
+                            <h3 class="text-[10px] font-extrabold text-slate-800 leading-tight">Aksi Cepat Operasional Kurir</h3>
+                            <p class="text-[8px] text-slate-500">Input paket saat standby di Pos 3, jemput panggilan Teacher, atau scan QR paket</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-1.5">
+                        <button type="button" onclick="window.openManifestModal()" class="bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 px-2.5 py-1.5 rounded-xl text-[8.5px] font-extrabold transition flex items-center space-x-1 whitespace-nowrap" title="Cetak Surat Jalan / Manifest Pengantaran"><i class="fa-solid fa-print"></i><span>Surat Jalan</span></button>
+                        <button type="button" onclick="window.exportCourierReport('all')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-xl text-[8.5px] font-extrabold transition flex items-center space-x-1 whitespace-nowrap" title="Download Laporan CSV"><i class="fa-solid fa-file-excel"></i><span>Export CSV</span></button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-0.5">
+                    <button type="button" onclick="window.openCourierQuickInput('pos3')" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white py-2 px-3 rounded-xl text-[9.5px] font-extrabold shadow-sm transition flex items-center justify-center space-x-2 btn-glow">
+                        <i class="fa-solid fa-plus-circle text-xs"></i><span>+ Input Standby Pos 3</span>
                     </button>
-                    <button onclick="window.switchCourierSubTab('delivering')" id="courier-subtab-delivering" class="py-1 px-2 rounded-xl text-[9px] font-bold transition text-slate-600 hover:bg-slate-100 flex items-center justify-center space-x-1">
-                        <i class="fa-solid fa-paper-plane text-sky-400"></i><span>Dikirim (<span id="count-delivering-badge">0</span>)</span>
+                    <button type="button" onclick="window.openCourierQuickInput('teacher-call')" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-2 px-3 rounded-xl text-[9.5px] font-extrabold shadow-sm transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-headset text-xs"></i><span>+ Input Panggilan Teacher</span>
                     </button>
-                    <button onclick="window.switchCourierSubTab('completed')" id="courier-subtab-completed" class="py-1 px-2 rounded-xl text-[9px] font-bold transition text-slate-600 hover:bg-slate-100 flex items-center justify-center space-x-1">
-                        <i class="fa-solid fa-circle-check text-emerald-400"></i><span>Selesai (<span id="count-completed-badge">0</span>)</span>
+                    <button type="button" onclick="window.openBarcodeModal('courier')" class="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white py-2 px-3 rounded-xl text-[9.5px] font-extrabold shadow-sm transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-qrcode text-xs"></i><span>Scan QR Ambil / Selesai</span>
                     </button>
                 </div>
-                <div class="flex items-center space-x-1 shrink-0">
-                    <button type="button" onclick="window.openBarcodeModal('courier')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-xl text-[8.5px] font-bold shadow transition flex items-center space-x-1 whitespace-nowrap btn-glow" title="Scan Stiker QR / Barcode Paket untuk Ambil atau Selesaikan"><i class="fa-solid fa-qrcode"></i><span>Scan QR Paket</span></button>
-                    <button type="button" onclick="window.openManifestModal()" class="bg-sky-600 hover:bg-sky-700 text-white px-2.5 py-1 rounded-xl text-[8.5px] font-bold shadow transition flex items-center space-x-1 whitespace-nowrap" title="Cetak Surat Jalan / Manifest Pengantaran"><i class="fa-solid fa-print"></i><span class="hidden sm:inline">Surat Jalan</span></button>
-                    <button type="button" onclick="window.exportCourierReport('all')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-xl text-[8.5px] font-bold shadow transition flex items-center space-x-1 whitespace-nowrap"><i class="fa-solid fa-file-excel"></i><span class="hidden sm:inline">CSV</span></button>
-                </div>
+            </div>
+
+            <!-- Baris Menu Tab Status Pengantaran Kurir (Lebar Penuh & Rapi) -->
+            <div class="bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100 grid grid-cols-3 gap-1.5 relative z-20">
+                <button type="button" onclick="window.switchCourierSubTab('pending')" id="courier-subtab-pending" class="py-2 px-2.5 rounded-xl text-[9.5px] font-extrabold transition bg-indigo-600 text-white shadow flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-list-check text-amber-300"></i><span>Antrian Pos (<span id="count-pending-badge">0</span>)</span>
+                </button>
+                <button type="button" onclick="window.switchCourierSubTab('delivering')" id="courier-subtab-delivering" class="py-2 px-2.5 rounded-xl text-[9.5px] font-extrabold transition text-slate-600 hover:bg-slate-100 flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-paper-plane text-sky-400"></i><span>Sedang Dikirim (<span id="count-delivering-badge">0</span>)</span>
+                </button>
+                <button type="button" onclick="window.switchCourierSubTab('completed')" id="courier-subtab-completed" class="py-2 px-2.5 rounded-xl text-[9.5px] font-extrabold transition text-slate-600 hover:bg-slate-100 flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i><span>Selesai (<span id="count-completed-badge">0</span>)</span>
+                </button>
             </div>
 
             <!-- Batch Action Bar -->
@@ -635,7 +664,7 @@
 
         <!-- VIEW ADMIN -->
         <div id="view-admin" class="tab-view space-y-2.5">
-            <div class="flex justify-between items-center bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100 overflow-x-auto no-scrollbar sticky top-14 z-30">
+            <div class="flex justify-between items-center bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100 overflow-x-auto no-scrollbar relative z-20">
                 <div class="flex space-x-1">
                     <button onclick="window.switchAdminTab('overview')" id="adm-tab-overview" class="px-2.5 py-1 rounded-xl text-[9.5px] font-bold transition bg-indigo-600 text-white shadow flex items-center space-x-1 whitespace-nowrap"><i class="fa-solid fa-chart-pie mr-1 text-amber-300"></i><span>Overview & Radar</span></button>
                     <button onclick="window.switchAdminTab('packages')" id="adm-tab-packages" class="px-2.5 py-1 rounded-xl text-[9.5px] font-bold transition text-slate-600 hover:bg-slate-100 flex items-center space-x-1 whitespace-nowrap"><i class="fa-solid fa-box-open mr-1 text-purple-500"></i><span>Inspeksi & Kelola Paket</span></button>
@@ -851,7 +880,7 @@
     </main>
 
     <footer class="bg-white border-t border-slate-200 py-2.5 text-center text-[9px] text-slate-500 mt-auto">
-        <p>© 2026 Aufah Tech. All Rights Reserved. (PWA & Smart School Logistics v4.4.9 — Super Admin Center)</p>
+        <p>© 2026 Aufah Tech. All Rights Reserved. (PWA & Smart School Logistics v4.5.2 — Super Admin Center)</p>
     </footer>
 
     <!-- Modal 360° Package Inspector (Admin) -->
@@ -1746,7 +1775,8 @@
 
         let members = [
             { id: 'usr-superadm', name: 'Administrator', username: 'admin', email: 'admin', password: '123456', role: 'admin', status: 'Aktif' },
-            { id: 'usr-aufah', name: 'Aufah (Kurir & Petugas)', username: 'aufah', email: 'aufah', password: '123456', role: 'kurir', status: 'Aktif' }
+            { id: 'usr-aufah', name: 'Aufah (Kurir)', username: 'aufah', email: 'aufah', password: '123456', role: 'kurir', status: 'Aktif' },
+            { id: 'usr-pos3', name: 'Petugas Pos 3', username: 'pos3', email: 'pos3', password: '123456', role: 'petugas', status: 'Aktif' }
         ];
         let packages = [];
         let auditLogs = [];
@@ -2506,7 +2536,7 @@
         };
 
         window.downloadDatabaseBackup = function() {
-            const backupData = { app: 'Kurir BNS Sekolah', version: '4.4.9', exportedAt: new Date().toISOString(), packages, members, schoolDirectory, resetRequests, auditLogs };
+            const backupData = { app: 'Kurir BNS Sekolah', version: '4.5.2', exportedAt: new Date().toISOString(), packages, members, schoolDirectory, resetRequests, auditLogs };
             const a = document.createElement('a');
             a.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2)));
             a.setAttribute("download", "kurir_bns_backup_" + new Date().toISOString().slice(0,10) + ".json");
@@ -2662,9 +2692,16 @@
             }
             const resolvedUname = getMemberUsername(foundUser);
             const isSuperAdmin = resolvedUname === 'admin' || foundUser.role === 'admin';
-            const activeRole = isSuperAdmin ? role : foundUser.role;
+            const isCourierDual = foundUser.role === 'kurir';
+            // Jika akun adalah Petugas, kunci khusus di Pos 3 (tidak bisa masuk ke role Kurir)
+            if (foundUser.role === 'petugas' && role === 'kurir') {
+                showToast('Akun Petugas dikhususkan untuk Pos 3, dialihkan ke halaman Petugas Pos 3.', 'info');
+            }
+            const activeRole = isSuperAdmin
+                ? role
+                : (isCourierDual && (role === 'petugas' || role === 'kurir') ? role : foundUser.role);
             loggedUser = {
-                name: foundUser.name, username: resolvedUname, email: resolvedUname, role: activeRole, isSuperAdmin,
+                name: foundUser.name, username: resolvedUname, email: resolvedUname, role: activeRole, memberRole: foundUser.role, isSuperAdmin, isDualStaff: isCourierDual,
                 avatar: foundUser.avatar || `https://placehold.co/100x100/4338ca/ffffff?text=${encodeURIComponent(foundUser.name.slice(0,2).toUpperCase())}`
             };
             localStorage.setItem('kurir_bns_logged_user', JSON.stringify(loggedUser));
@@ -2679,21 +2716,57 @@
         };
 
         window.switchRole = function(role) {
+            const isCourierAccount = !loggedUser.isSuperAdmin && (loggedUser.memberRole === 'kurir' || (loggedUser.isDualStaff && loggedUser.memberRole !== 'petugas'));
+            const isPetugasOnly = !loggedUser.isSuperAdmin && !isCourierAccount && (loggedUser.memberRole === 'petugas' || loggedUser.role === 'petugas');
+
+            // Proteksi Ketat: Akun Petugas khusus Pos 3 tidak diizinkan membuka tampilan Kurir
+            if (isPetugasOnly && role === 'kurir') {
+                role = 'petugas';
+                showToast('Akses dibatasi: Petugas khusus bertugas di Pos 3 (tidak dapat mengambil peran Kurir).', 'error');
+            }
+
             currentRole = role;
             const desktopNav = document.getElementById('desktop-role-nav');
             const mobileNav = document.getElementById('mobile-role-nav');
+
             if (loggedUser.isSuperAdmin) {
                 const html = ['petugas', 'kurir', 'penerima', 'admin'].map(r => `<button onclick="window.switchRole('${r}')" class="px-2.5 py-1 rounded-lg transition ${r===role?'bg-white text-indigo-800 font-bold':'text-indigo-100'}">${r.toUpperCase()}</button>`).join('');
                 if (desktopNav) desktopNav.innerHTML = html;
                 if (mobileNav) mobileNav.innerHTML = html;
+            } else if (isCourierAccount) {
+                // Khusus Kurir: Bisa menginput paket saat standby di Pos 3 / Panggilan Teacher & kembali ke Antar Paket
+                const dualRoles = [
+                    { key: 'petugas', label: 'INPUT POS 3 / PANGGILAN' },
+                    { key: 'kurir', label: 'ANTAR PAKET (KURIR)' }
+                ];
+                const htmlDesktop = dualRoles.map(r => `<button onclick="window.switchRole('${r.key}')" class="px-2.5 py-1 rounded-lg transition ${r.key===role?'bg-white text-indigo-800 font-bold shadow-sm':'text-indigo-100 hover:bg-white/10'}">${r.label}</button>`).join('');
+                const htmlMobile = dualRoles.map(r => `<button onclick="window.switchRole('${r.key}')" class="col-span-2 py-1 px-2 rounded-lg transition text-[10px] ${r.key===role?'bg-white text-indigo-800 font-extrabold shadow':'text-indigo-100 border border-white/20'}">${r.label}</button>`).join('');
+                if (desktopNav) desktopNav.innerHTML = htmlDesktop;
+                if (mobileNav) mobileNav.innerHTML = htmlMobile;
             } else {
-                if (desktopNav) desktopNav.innerHTML = `<span class="px-3 py-1 rounded-lg bg-white text-indigo-800 font-bold">${role.toUpperCase()}</span>`;
-                if (mobileNav) mobileNav.innerHTML = `<span class="text-white font-bold text-center col-span-4">${role.toUpperCase()}</span>`;
+                const badgeLabel = isPetugasOnly ? 'PETUGAS KHUSUS POS 3' : role.toUpperCase();
+                if (desktopNav) desktopNav.innerHTML = `<span class="px-3 py-1 rounded-lg bg-white text-indigo-800 font-bold">${badgeLabel}</span>`;
+                if (mobileNav) mobileNav.innerHTML = `<span class="text-white font-bold text-center col-span-4">${badgeLabel}</span>`;
             }
+
+            const backKurirBtn = document.getElementById('btn-back-to-kurir');
+            if (backKurirBtn) {
+                backKurirBtn.classList.toggle('hidden', !(isCourierAccount || loggedUser.isSuperAdmin));
+                backKurirBtn.classList.toggle('flex', (isCourierAccount || loggedUser.isSuperAdmin));
+            }
+
             ['petugas', 'kurir', 'penerima', 'admin'].forEach(r => {
                 document.getElementById(`view-${r}`)?.classList.toggle('active', r === role);
             });
-            if (role === 'petugas') { window.switchPetugasTab('input'); window.renderPetugasForm(); }
+            if (role === 'petugas') {
+                window.switchPetugasTab('input');
+                window.renderPetugasForm();
+                // Jika yang sedang login adalah Kurir, otomatis set dropdown "Tugaskan Kurir" ke namanya sendiri agar langsung diantar
+                const assignEl = document.getElementById('input-assign-courier');
+                if (assignEl && loggedUser.name && [...assignEl.options].some(o => o.value === loggedUser.name)) {
+                    assignEl.value = loggedUser.name;
+                }
+            }
             if (role === 'kurir') { window.switchCourierSubTab('pending'); window.renderCourierView(); }
             if (role === 'penerima') {
                 const recInput = document.getElementById('receiver-session-name');
@@ -2718,6 +2791,37 @@
             if (tab === 'status') window.renderPetugasStatusView();
         };
 
+        window.applyInputQuickPreset = function(presetType) {
+            if (presetType === 'teacher-call') {
+                window.switchSourceType('internal');
+                const roleEl = document.getElementById('input-recipient-role');
+                if (roleEl) roleEl.value = 'Teacher';
+                const slaEl = document.getElementById('input-sla');
+                if (slaEl) slaEl.value = '30 menit (cepat)';
+                const roomSenderEl = document.getElementById('input-room-sender');
+                if (roomSenderEl && !roomSenderEl.value) roomSenderEl.value = 'Ruang Guru / Panggilan Teacher';
+                const notesEl = document.getElementById('input-notes');
+                if (notesEl && (!notesEl.value || notesEl.value === '-')) notesEl.value = 'Panggilan Teacher (Jemput / Antar Paket)';
+                showToast('📞 Mode Panggilan Teacher aktif: Sumber diset ke Internal & Prioritas 30 Menit!', 'info');
+            } else {
+                window.switchSourceType('external');
+                const originEl = document.getElementById('input-origin');
+                if (originEl) originEl.value = 'POS 3';
+                showToast('⛺ Mode Standby Pos 3 aktif: Siap input paket masuk di Pos 3!', 'info');
+            }
+            // Otomatis pilih kurir yang sedang login agar paket langsung masuk ke daftar antarnya
+            const assignEl = document.getElementById('input-assign-courier');
+            if (assignEl && loggedUser.name && [...assignEl.options].some(o => o.value === loggedUser.name)) {
+                assignEl.value = loggedUser.name;
+            }
+        };
+
+        window.openCourierQuickInput = function(presetType = 'pos3') {
+            window.switchRole('petugas');
+            window.switchPetugasTab('input');
+            window.applyInputQuickPreset(presetType);
+        };
+
         window.togglePetugasFullscreen = function() {
             isPetugasFullscreen = !isPetugasFullscreen;
             document.getElementById('petugas-content-status')?.classList.toggle('fullscreen-mode', isPetugasFullscreen);
@@ -2733,13 +2837,13 @@
             const btnInt = document.getElementById('btn-src-int');
             if (btnExt) {
                 btnExt.className = type === 'external'
-                    ? "px-3 py-1 rounded-lg text-[9px] font-bold transition bg-indigo-600 text-white shadow flex items-center space-x-1"
-                    : "px-3 py-1 rounded-lg text-[9px] font-bold transition text-slate-600 hover:text-slate-900 flex items-center space-x-1";
+                    ? "py-2 px-3 rounded-xl text-[9.5px] font-extrabold transition bg-indigo-600 text-white shadow flex items-center justify-center space-x-1.5"
+                    : "py-2 px-3 rounded-xl text-[9.5px] font-extrabold transition text-slate-600 hover:text-slate-900 flex items-center justify-center space-x-1.5";
             }
             if (btnInt) {
                 btnInt.className = type === 'internal'
-                    ? "px-3 py-1 rounded-lg text-[9px] font-bold transition bg-indigo-600 text-white shadow flex items-center space-x-1"
-                    : "px-3 py-1 rounded-lg text-[9px] font-bold transition text-slate-600 hover:text-slate-900 flex items-center space-x-1";
+                    ? "py-2 px-3 rounded-xl text-[9.5px] font-extrabold transition bg-purple-600 text-white shadow flex items-center justify-center space-x-1.5"
+                    : "py-2 px-3 rounded-xl text-[9.5px] font-extrabold transition text-slate-600 hover:text-slate-900 flex items-center justify-center space-x-1.5";
             }
             window.renderPetugasForm();
         };
@@ -2783,9 +2887,9 @@
             } else {
                 container.innerHTML = `
                     <div><label class="block text-[8.5px] font-semibold mb-0.5">ID Transaksi (Auto)</label><input type="text" id="input-trx" value="${trxId}" readonly class="w-full px-2 py-1 rounded border text-[9.5px] font-mono font-bold bg-slate-100"></div>
-                    <div><label class="block text-[8.5px] font-semibold mb-0.5">No Referensi</label><input type="text" id="input-resi" oninput="window.saveFormDraft()" value="INT-${trxId.replace('TRX-', '')}" required class="w-full px-2 py-1 rounded border text-[9.5px] font-mono"></div>
-                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Pengirim Internal</label><input type="text" id="input-sender-internal" oninput="window.saveFormDraft()" required placeholder="Nama Pengirim" class="w-full px-2 py-1 rounded border text-[9.5px]"></div>
-                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Ruang Pengirim</label><input type="text" id="input-room-sender" oninput="window.saveFormDraft()" required placeholder="Ruang Guru / TU" class="w-full px-2 py-1 rounded border text-[9.5px]"></div>
+                    <div><label class="block text-[8.5px] font-semibold mb-0.5">No Referensi / Panggilan</label><input type="text" id="input-resi" oninput="window.saveFormDraft()" value="INT-${trxId.replace('TRX-', '')}" required class="w-full px-2 py-1 rounded border text-[9.5px] font-mono"></div>
+                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Nama Teacher / Pengirim Internal</label><input type="text" id="input-sender-internal" list="school-recipient-directory" oninput="window.saveFormDraft()" required placeholder="Ketik nama Teacher / Pengirim..." class="w-full px-2 py-1 rounded border text-[9.5px]"></div>
+                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Lokasi Jemput / Ruang Pengirim</label><input type="text" id="input-room-sender" list="school-room-directory" oninput="window.saveFormDraft()" required placeholder="Cth: Ruang Guru / Pos 3 / TU" class="w-full px-2 py-1 rounded border text-[9.5px]"></div>
                 `;
             }
             window.loadFormDraft();
@@ -3098,7 +3202,9 @@
             packages.unshift(pkg);
             window.closeSummaryModal();
             await syncPackageToFirebase(pkg);
-            addAuditLog(`Petugas (${loggedUser.name}) menginput paket baru ${pkg.id} untuk ${pkg.recipient}`, loggedUser.name, 'PETUGAS');
+            const inputActorRole = (loggedUser.memberRole === 'kurir') ? 'KURIR' : 'PETUGAS';
+            const inputActorLabel = (inputActorRole === 'KURIR') ? `Kurir Standby Pos 3 (${loggedUser.name})` : `Petugas Pos 3 (${loggedUser.name})`;
+            addAuditLog(`${inputActorLabel} menginput paket baru ${pkg.id} untuk ${pkg.recipient}`, loggedUser.name, inputActorRole);
             physicalPhotoDataUrl = null;
             document.getElementById('physical-photo-preview-wrap')?.classList.add('hidden');
             const badge = document.getElementById('photo-status-badge');
@@ -3208,8 +3314,8 @@
                 document.getElementById(`courier-panel-${s}`)?.classList.toggle('hidden', s !== sub);
                 const btn = document.getElementById(`courier-subtab-${s}`);
                 if (btn) btn.className = s === sub
-                    ? "py-1 px-2 rounded-xl text-[9px] font-bold transition bg-indigo-600 text-white shadow flex items-center justify-center space-x-1"
-                    : "py-1 px-2 rounded-xl text-[9px] font-bold transition text-slate-600 hover:bg-slate-100 flex items-center justify-center space-x-1";
+                    ? "py-2 px-2.5 rounded-xl text-[9.5px] font-extrabold transition bg-indigo-600 text-white shadow flex items-center justify-center space-x-1.5"
+                    : "py-2 px-2.5 rounded-xl text-[9.5px] font-extrabold transition text-slate-600 hover:bg-slate-100 flex items-center justify-center space-x-1.5";
             });
             window.clearCourierSelection();
         };
