@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kurir BNS - Sekolah & Manajemen Paket Realtime</title>
+    <title>Kurir BNS Express - Sekolah & Manajemen Paket Realtime</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -96,6 +96,8 @@
         .toast-anim { animation: slide-in 0.25s ease forwards; backdrop-filter: blur(16px); }
         .zoomable-img { transition: all 0.25s ease; cursor: zoom-in; border-radius: 0.5rem !important; }
         .zoomable-img:hover { transform: scale(1.06); }
+        /* Memastikan seluruh informasi transaksi membungkus (wrap) dengan rapi dan tidak pernah terpotong */
+        .trx-info-card { word-break: break-word; overflow-wrap: anywhere; }
         .petugas-status-grid-wrap { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.85rem; align-items: start; height: calc(100vh - 13.5rem); min-height: 480px; }
         @media (max-width: 768px) { .petugas-status-grid-wrap { grid-template-columns: 1fr; height: auto; gap: 0.75rem; } }
         #petugas-content-status.fullscreen-mode {
@@ -113,6 +115,8 @@
             body.printing-report #print-report-area { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; }
             body.printing-audit #print-audit-area, body.printing-audit #print-audit-area * { visibility: visible !important; }
             body.printing-audit #print-audit-area { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; }
+            body.printing-manifest #print-manifest-card, body.printing-manifest #print-manifest-card * { visibility: visible !important; background-color: #ffffff !important; color: #0f172a !important; }
+            body.printing-manifest #print-manifest-card { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; box-shadow: none !important; border: none !important; }
         }
         @keyframes pulse-urgent { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
         .sla-overdue-badge { animation: pulse-urgent 1.2s infinite ease-in-out; }
@@ -239,7 +243,7 @@
             <form onsubmit="window.handleLogin(event)" class="space-y-3">
                 <div>
                     <label class="block text-[9.5px] font-bold text-slate-700 mb-1" id="login-label-name">Username</label>
-                    <input type="text" id="login-username" oninput="window.handleLoginEmailInput(this.value)" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none bg-white/90" placeholder="Ketik username (cth: admin / gari)...">
+                    <input type="text" id="login-username" oninput="window.handleLoginEmailInput(this.value)" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none bg-white/90" placeholder="Ketik username (cth: admin / aufah)...">
                 </div>
                 <div id="password-field-group">
                     <div class="flex justify-between items-center mb-1">
@@ -263,7 +267,7 @@
             </form>
             <div class="bg-slate-50/80 p-2 rounded-xl border border-white text-[8.5px] text-slate-500 text-center flex justify-between items-center px-3">
                 <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Cloud Firebase Aktif</span>
-                <span class="font-mono text-[8px] text-indigo-600 font-bold">Smart Logistics v4.4</span>
+                <span class="font-mono text-[8px] text-indigo-600 font-bold">Smart Logistics v4.4.9</span>
             </div>
         </div>
     </div>
@@ -282,7 +286,7 @@
                             <span id="connection-text">Cloud Sync</span>
                         </div>
                     </div>
-                    <p id="header-user-badge" class="text-[8.5px] text-indigo-100/90 font-medium truncate max-w-[180px]">Masuk: -</p>
+                    <p id="header-user-badge" class="text-[8.5px] text-indigo-100/90 font-medium break-words">Masuk: -</p>
                 </div>
             </div>
 
@@ -321,10 +325,10 @@
 
     <!-- Global Broadcast Banner -->
     <div id="global-broadcast-banner" class="hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white px-3 py-1.5 shadow-md">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 text-[9.5px] font-bold">
-            <div class="flex items-center space-x-2 truncate">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-[9.5px] font-bold">
+            <div class="flex items-start sm:items-center space-x-2 break-words flex-1">
                 <span class="bg-white text-rose-600 px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase shrink-0"><i class="fa-solid fa-bullhorn mr-1"></i>Info Admin</span>
-                <span id="global-broadcast-text" class="truncate"></span>
+                <span id="global-broadcast-text" class="break-words leading-snug"></span>
             </div>
             <span id="global-broadcast-time" class="text-[8px] text-amber-100 font-mono shrink-0"></span>
         </div>
@@ -409,9 +413,12 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-2.5">
                             <div>
-                                <label class="block text-[9px] font-bold text-slate-700 mb-1"><i class="fa-solid fa-boxes-stacked text-purple-500 mr-1"></i> Kategori</label>
-                                <select id="input-category" onchange="window.saveFormDraft()" class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-[10px] bg-white">
-                                    <option value="dokumen">Dokumen / Surat</option><option value="makanan">Makanan / Minuman</option><option value="barang">Barang / Paket Umum</option>
+                                <label class="block text-[9px] font-bold text-slate-700 mb-1 flex items-center justify-between">
+                                    <span><i class="fa-solid fa-boxes-stacked text-purple-500 mr-1"></i> Kategori</span>
+                                    <span id="food-sla-badge" class="hidden text-[7.5px] bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded-full font-extrabold">⚡ Cepat 30m</span>
+                                </label>
+                                <select id="input-category" onchange="window.handleCategoryChange(this.value)" class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-[10px] bg-white">
+                                    <option value="dokumen">Dokumen / Surat</option><option value="makanan">Makanan / Minuman (Segera)</option><option value="barang">Barang / Paket Umum</option>
                                 </select>
                             </div>
                             <div>
@@ -435,6 +442,23 @@
                             <div>
                                 <label class="block text-[9px] font-bold text-slate-700 mb-1"><i class="fa-solid fa-note-sticky text-emerald-500 mr-1"></i> Catatan</label>
                                 <input type="text" id="input-notes" oninput="window.saveFormDraft()" placeholder="Cth: Jangan dibanting" class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-[10px]">
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 bg-amber-50/70 rounded-2xl border border-amber-200/80 grid grid-cols-1 md:grid-cols-3 gap-2.5 items-center">
+                            <div>
+                                <label class="block text-[9px] font-bold text-amber-900 mb-0.5"><i class="fa-solid fa-money-bill-wave text-amber-600 mr-1"></i> Status Pembayaran / COD</label>
+                                <select id="input-cod-status" onchange="window.handleCodStatusChange(this.value)" class="w-full px-2.5 py-1 rounded-xl border border-amber-300 text-[9.5px] bg-white font-semibold">
+                                    <option value="non-cod">Non-COD (Sudah Lunas)</option>
+                                    <option value="cod">COD (Bayar di Tempat / Belum Lunas)</option>
+                                </select>
+                            </div>
+                            <div id="input-cod-amount-wrap" class="hidden">
+                                <label class="block text-[9px] font-bold text-rose-700 mb-0.5"><i class="fa-solid fa-coins text-rose-500 mr-1"></i> Nominal Tagihan COD (Rp)</label>
+                                <input type="text" id="input-cod-amount" oninput="window.saveFormDraft()" placeholder="Cth: Rp 45.000" class="w-full px-2.5 py-1 rounded-xl border border-rose-300 text-[9.5px] font-mono font-bold text-rose-700 bg-white">
+                            </div>
+                            <div class="text-[8.5px] text-amber-800 leading-snug">
+                                <i class="fa-solid fa-circle-info mr-1 text-amber-600"></i>Jika paket <strong>COD</strong>, sistem akan memberi penanda khusus agar Pos Piket & Kurir menagih pembayaran saat serah terima.
                             </div>
                         </div>
 
@@ -521,7 +545,11 @@
                         <i class="fa-solid fa-circle-check text-emerald-400"></i><span>Selesai (<span id="count-completed-badge">0</span>)</span>
                     </button>
                 </div>
-                <button onclick="window.exportCourierReport('all')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-xl text-[8.5px] font-bold shadow transition flex items-center space-x-1 whitespace-nowrap"><i class="fa-solid fa-file-excel"></i><span>Export Semua CSV</span></button>
+                <div class="flex items-center space-x-1 shrink-0">
+                    <button type="button" onclick="window.openBarcodeModal('courier')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-xl text-[8.5px] font-bold shadow transition flex items-center space-x-1 whitespace-nowrap btn-glow" title="Scan Stiker QR / Barcode Paket untuk Ambil atau Selesaikan"><i class="fa-solid fa-qrcode"></i><span>Scan QR Paket</span></button>
+                    <button type="button" onclick="window.openManifestModal()" class="bg-sky-600 hover:bg-sky-700 text-white px-2.5 py-1 rounded-xl text-[8.5px] font-bold shadow transition flex items-center space-x-1 whitespace-nowrap" title="Cetak Surat Jalan / Manifest Pengantaran"><i class="fa-solid fa-print"></i><span class="hidden sm:inline">Surat Jalan</span></button>
+                    <button type="button" onclick="window.exportCourierReport('all')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-xl text-[8.5px] font-bold shadow transition flex items-center space-x-1 whitespace-nowrap"><i class="fa-solid fa-file-excel"></i><span class="hidden sm:inline">CSV</span></button>
+                </div>
             </div>
 
             <!-- Batch Action Bar -->
@@ -590,7 +618,7 @@
                 <div class="bg-white/10 p-1.5 rounded-xl flex items-center space-x-1">
                     <div class="relative">
                         <label class="block text-[7.5px] uppercase font-bold text-emerald-200 mb-0.5">Filter Nama / Ruangan</label>
-                        <input type="text" id="receiver-session-name" oninput="window.renderReceiverView()" placeholder="Semua / Ketik nama..." class="px-2 py-1 pr-6 rounded-lg bg-white text-slate-800 text-[9.5px] font-semibold w-40">
+                        <input type="text" id="receiver-session-name" oninput="window.renderReceiverView()" placeholder="Ketik nama / ruangan Anda..." class="px-2 py-1 pr-6 rounded-lg bg-white text-slate-800 text-[9.5px] font-semibold w-44">
                     </div>
                 </div>
             </div>
@@ -756,8 +784,18 @@
             <div id="admin-content-directory" class="admin-tab-content space-y-2 hidden">
                 <div class="bg-white p-3 rounded-2xl shadow-sm space-y-2.5">
                     <div class="flex flex-wrap justify-between items-center border-b pb-2 gap-2">
-                        <div><h3 class="font-bold text-slate-800 text-[10px]">Master Direktori Guru, Staf & Ruangan Sekolah</h3></div>
-                        <button onclick="window.openDirectoryModal()" class="bg-teal-600 text-white font-bold py-1 px-3 rounded-xl text-[9px] shadow"><i class="fa-solid fa-plus mr-1"></i>Tambah Kontak Direktori</button>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-[10px]">Master Direktori Guru, Staf & Ruangan Sekolah (<span id="dir-total-count-label">3</span> Kontak)</h3>
+                            <p class="text-[8px] text-slate-500">Gunakan Import CSV untuk memasukkan ratusan kontak guru/staf/siswa sekaligus</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <button type="button" onclick="window.downloadDirectoryCsvTemplate()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1 px-2.5 rounded-xl text-[8.5px] border border-slate-300"><i class="fa-solid fa-file-csv mr-1 text-teal-600"></i>Template CSV</button>
+                            <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-2.5 rounded-xl text-[8.5px] shadow flex items-center space-x-1">
+                                <i class="fa-solid fa-file-import"></i><span>Import CSV</span>
+                                <input type="file" accept=".csv,text/csv" onchange="window.handleImportDirectoryCsv(event)" class="hidden">
+                            </label>
+                            <button type="button" onclick="window.openDirectoryModal()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-1 px-3 rounded-xl text-[8.5px] shadow"><i class="fa-solid fa-plus mr-1"></i>Tambah Kontak</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-[9px]">
@@ -813,7 +851,7 @@
     </main>
 
     <footer class="bg-white border-t border-slate-200 py-2.5 text-center text-[9px] text-slate-500 mt-auto">
-        <p>© 2026 Aufah Tech. All Rights Reserved. (PWA & Smart School Logistics v4.4 — Super Admin Center)</p>
+        <p>© 2026 Aufah Tech. All Rights Reserved. (PWA & Smart School Logistics v4.4.9 — Super Admin Center)</p>
     </footer>
 
     <!-- Modal 360° Package Inspector (Admin) -->
@@ -855,11 +893,11 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block font-bold mb-0.5">Alihkan Kurir</label>
-                        <select id="edit-pkg-courier" class="w-full px-2 py-1 rounded border bg-white"></select>
+                        <select id="edit-pkg-courier" onchange="window.handleAdminEditCourierChange(this.value)" class="w-full px-2 py-1 rounded border bg-white"></select>
                     </div>
                     <div>
                         <label class="block font-bold mb-0.5">Paksa Status</label>
-                        <select id="edit-pkg-status" class="w-full px-2 py-1 rounded border bg-white">
+                        <select id="edit-pkg-status" onchange="window.handleAdminEditStatusChange(this.value)" class="w-full px-2 py-1 rounded border bg-white">
                             <option value="pending">Pending (Antrian Pos)</option>
                             <option value="delivering">Delivering (Sedang Diantar)</option>
                             <option value="completed">Completed (Selesai)</option>
@@ -874,6 +912,17 @@
                         <option value="24 jam (besok)">24 jam (besok)</option>
                         <option value="3 hari (akhir pekan / senin)">3 hari (akhir pekan / senin)</option>
                     </select>
+                </div>
+                <div id="edit-pkg-completion-wrap" class="hidden p-2 rounded-xl bg-emerald-50/80 border border-emerald-200 space-y-1">
+                    <label class="block font-bold text-emerald-900 text-[8.5px]"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i>Keterangan Diterima / Selesai</label>
+                    <input type="text" id="edit-pkg-completion-option" placeholder="Cth: Diterima langsung oleh yang bersangkutan" class="w-full px-2 py-1 rounded border border-emerald-300 bg-white text-[9px]">
+                </div>
+                <div id="edit-pkg-reset-proof-wrap" class="hidden p-2 rounded-xl bg-amber-50/90 border border-amber-200 space-y-1">
+                    <label class="flex items-center space-x-1.5 cursor-pointer text-[8.5px] font-bold text-amber-900">
+                        <input type="checkbox" id="edit-pkg-clear-proof" checked class="rounded text-amber-600">
+                        <span>Reset Waktu Selesai, Keterangan Terima & Bukti Kurir/TTD</span>
+                    </label>
+                    <p class="text-[7.5px] text-amber-700 leading-tight">Karena status dikembalikan ke Pending / Sedang Diantar, keterangan "Sudah Diterima" otomatis dihapus agar status paket bersih kembali.</p>
                 </div>
                 <div><label class="block font-bold mb-0.5">Catatan Paket</label><input type="text" id="edit-pkg-notes" class="w-full px-2 py-1 rounded border"></div>
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl text-xs shadow">Simpan Perubahan Admin</button>
@@ -1040,6 +1089,7 @@
                 <div class="flex justify-between border-b pb-0.5"><span class="text-slate-500">Sumber:</span> <strong id="sum-source"></strong></div>
                 <div class="flex justify-between border-b pb-0.5"><span class="text-slate-500">Penerima:</span> <strong id="sum-recipient"></strong></div>
                 <div class="flex justify-between border-b pb-0.5"><span class="text-slate-500">Tujuan:</span> <strong id="sum-dest"></strong></div>
+                <div class="flex justify-between border-b pb-0.5"><span class="text-slate-500">PIN Serah Terima:</span> <strong id="sum-pin" class="font-mono text-emerald-700 bg-emerald-50 px-1.5 rounded"></strong></div>
                 <div class="flex justify-between border-b pb-0.5"><span class="text-slate-500">Petugas:</span> <strong id="sum-petugas"></strong></div>
                 <div class="flex justify-between items-center"><span class="text-slate-500">Foto Fisik:</span> <img id="sum-photo" src="" class="w-7 h-7 object-cover rounded border"></div>
             </div>
@@ -1069,6 +1119,14 @@
                     </label>
                 </div>
                 <div><label class="block text-[8px] font-semibold mb-0.5">Nama Penerima / Perwakilan</label><input type="text" id="confirm-receiver-name" class="w-full px-2 py-0.5 rounded border text-[9px]"></div>
+                <div id="confirm-pin-group" class="p-2 rounded-xl bg-amber-50/90 border border-amber-200 space-y-1">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-[8px] font-extrabold text-amber-900"><i class="fa-solid fa-key text-amber-600 mr-1"></i>PIN Verifikasi Terima (4 Digit)</label>
+                        <span id="confirm-pin-badge" class="text-[7.5px] px-1.5 py-0.2 rounded bg-amber-200 text-amber-900 font-bold">Wajib utk Penerima</span>
+                    </div>
+                    <input type="text" id="confirm-pin-input" maxlength="6" placeholder="Ketik 4 digit PIN paket / 4 digit akhir WA..." class="w-full px-2 py-1 rounded border border-amber-300 text-[9.5px] font-mono font-bold tracking-widest text-center bg-white">
+                    <p id="confirm-pin-hint" class="text-[7.5px] text-amber-700 leading-tight">Masukkan 4 digit PIN Paket (tertera di WA / Stiker QR) atau 4 angka terakhir No. WhatsApp penerima.</p>
+                </div>
                 <div>
                     <label class="block text-[8px] font-semibold mb-0.5">Opsi Keterangan Selesai</label>
                     <select id="confirm-completion-option" class="w-full px-2 py-0.5 rounded border text-[9px] bg-white">
@@ -1106,11 +1164,66 @@
                     <div><span>Kepada:</span> <strong id="qr-label-recipient"></strong></div>
                     <div><span>Tujuan:</span> <strong id="qr-label-dest" class="text-rose-600"></strong></div>
                     <div><span>Prioritas:</span> <strong id="qr-label-sla" class="text-indigo-700"></strong></div>
+                    <div><span>PIN Terima:</span> <strong id="qr-label-pin" class="font-mono text-emerald-700"></strong></div>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-1.5">
                 <button type="button" onclick="window.closeQrLabelModal()" class="py-1.5 rounded-lg border font-semibold text-[9px]">Tutup</button>
                 <button type="button" onclick="window.printQrLabelSticker()" class="py-1.5 rounded-lg bg-indigo-600 text-white font-bold text-[9px] shadow"><i class="fa-solid fa-print mr-1"></i>Cetak Stiker</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Courier Manifest / Surat Jalan Kolektif Modal -->
+    <div id="manifest-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-[75] flex items-center justify-center p-3 hidden">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-4 shadow-2xl space-y-3 max-h-[92vh] flex flex-col">
+            <div class="flex justify-between items-center border-b pb-2 shrink-0">
+                <div>
+                    <h3 class="font-extrabold text-slate-800 text-xs"><i class="fa-solid fa-clipboard-check text-sky-600 mr-1.5"></i>Surat Jalan / Manifest Pengantaran Kolektif Kurir</h3>
+                    <p class="text-[8.5px] text-slate-500">Daftar paket aktif untuk dibawa kurir lengkap dengan kolom paraf serah terima ruangan</p>
+                </div>
+                <button onclick="window.closeManifestModal()" class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-xs"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="overflow-y-auto flex-1 pr-1">
+                <div id="print-manifest-card" class="p-4 border rounded-2xl bg-white text-slate-900 space-y-3">
+                    <div class="flex justify-between items-start border-b-2 border-slate-800 pb-2">
+                        <div>
+                            <h2 class="text-sm font-extrabold uppercase tracking-tight text-indigo-900">KURIR BNS EXPRESS — MANIFEST PENGANTARAN</h2>
+                            <p class="text-[9px] text-slate-600" id="manifest-subtitle-info">Kurir Bertugas: -</p>
+                        </div>
+                        <div class="text-right text-[8.5px] font-mono">
+                            <div id="manifest-date-info" class="font-bold"></div>
+                            <div id="manifest-count-info" class="text-indigo-700 font-extrabold"></div>
+                        </div>
+                    </div>
+                    <table class="w-full text-left border-collapse text-[8.5px]">
+                        <thead>
+                            <tr class="bg-slate-100 border-y border-slate-400 uppercase font-extrabold text-slate-800">
+                                <th class="p-1.5 border border-slate-300 w-7 text-center">No</th>
+                                <th class="p-1.5 border border-slate-300">ID / Resi</th>
+                                <th class="p-1.5 border border-slate-300">Penerima & Tujuan</th>
+                                <th class="p-1.5 border border-slate-300">Kategori / COD / Catatan</th>
+                                <th class="p-1.5 border border-slate-300 w-14 text-center">PIN</th>
+                                <th class="p-1.5 border border-slate-300 w-28 text-center">Nama & Paraf Penerima</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manifest-table-body"></tbody>
+                    </table>
+                    <div class="grid grid-cols-2 gap-4 pt-3 text-[8.5px] text-center">
+                        <div>
+                            <p class="text-slate-600 mb-8">Diserahkan Oleh (Petugas Pos Piket)</p>
+                            <p class="font-bold border-t border-slate-400 pt-1 inline-block px-6">( ........................................ )</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-600 mb-8">Diterima & Diantar Oleh (Kurir)</p>
+                            <p class="font-bold border-t border-slate-400 pt-1 inline-block px-6" id="manifest-sign-courier">( ........................................ )</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 border-t pt-2 shrink-0">
+                <button type="button" onclick="window.closeManifestModal()" class="px-4 py-1.5 rounded-xl border font-bold text-[9.5px]">Tutup</button>
+                <button type="button" onclick="window.printCourierManifest()" class="px-4 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-[9.5px] shadow flex items-center space-x-1.5"><i class="fa-solid fa-print"></i><span>Cetak Surat Jalan</span></button>
             </div>
         </div>
     </div>
@@ -1163,7 +1276,85 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeFirestore, doc, setDoc, deleteDoc, onSnapshot, collection, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Silent log untuk menjaga kebersihan konsol browser
+        try { setLogLevel('silent'); } catch (e) {}
+
+        // Fungsi Sanitizer XSS untuk keamanan render string dinamis
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function sanitizeImageUrl(url) {
+            const s = String(url ?? '').trim();
+            if (s.startsWith('data:image/') || s.startsWith('https://') || s.startsWith('http://')) {
+                return escapeHtml(s);
+            }
+            return '';
+        }
+
+        // Sensor otomatis Nomor WhatsApp untuk menjaga privasi (Cth: 081234567890 -> 0812-••••-7890)
+        function maskPhoneNumber(phone, forceFull = false) {
+            const raw = String(phone ?? '').trim();
+            if (!raw || raw === '-') return '-';
+            if (forceFull) return escapeHtml(raw);
+            const digits = raw.replace(/\D/g, '');
+            if (digits.length < 7) return escapeHtml(raw);
+            const prefix = digits.slice(0, 4);
+            const suffix = digits.slice(-4);
+            return `${prefix}-••••-${suffix}`;
+        }
+
+        // Buat / ambil 4 digit PIN Verifikasi Serah Terima Paket
+        function getOrCreatePackagePin(pkg) {
+            if (!pkg) return '0000';
+            if (pkg.verifyPin && String(pkg.verifyPin).length === 4) return String(pkg.verifyPin);
+            let hash = 0;
+            const str = String(pkg.id || 'BNS');
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0;
+            }
+            const pin = String(1000 + (Math.abs(hash) % 9000));
+            pkg.verifyPin = pin;
+            return pin;
+        }
+
+        // Enkripsi Satu Arah (SHA-256) untuk Keamanan Kata Sandi Akun
+        async function hashPasswordSha256(plainText) {
+            const raw = String(plainText ?? '');
+            if (raw.startsWith('sha256:')) return raw;
+            try {
+                if (window.crypto && window.crypto.subtle) {
+                    const msgBuffer = new TextEncoder().encode(raw + '_bns_salt_2026');
+                    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgBuffer);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    return 'sha256:' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                }
+            } catch (e) {}
+            return raw;
+        }
+
+        async function verifyMemberPassword(memberObj, inputPassword) {
+            if (!memberObj) return false;
+            const stored = String(memberObj.password ?? '');
+            const inputRaw = String(inputPassword ?? '');
+            if (stored === inputRaw) return true;
+            const hashedInput = await hashPasswordSha256(inputRaw);
+            return stored === hashedInput;
+        }
+
+        window.getCodBadgeHtml = function(pkg) {
+            if (!pkg || !pkg.isCod) return '';
+            const amt = pkg.codAmount && pkg.codAmount !== '-' ? `: ${escapeHtml(pkg.codAmount)}` : '';
+            return `<span class="px-1.5 py-0.2 rounded text-[7.5px] font-extrabold bg-rose-100 text-rose-700 border border-rose-300"><i class="fa-solid fa-money-bill-wave mr-0.5"></i>COD${amt}</span>`;
+        };
 
         let deferredPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -1201,6 +1392,7 @@
 
         let loggedUser = { role: 'petugas', name: '', email: '', isSuperAdmin: false, avatar: 'https://placehold.co/100x100/4338ca/ffffff?text=BNS' };
         let currentRole = 'petugas';
+        let currentCourierSubTab = 'pending';
         let sourceType = 'external';
         let physicalPhotoDataUrl = null;
         let physicalCameraStream = null;
@@ -1354,23 +1546,31 @@
                 listEl.innerHTML = `<div class="text-center py-16 text-slate-500 text-base">Belum ada transaksi paket hari ini.</div>`;
                 return;
             }
-            listEl.innerHTML = displayList.map(p => `
-                <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap justify-between items-center gap-3">
-                    <div class="flex items-center space-x-3">
-                        <span class="px-3 py-1 rounded-xl font-mono font-extrabold text-xs ${p.status === 'completed' ? 'bg-emerald-500/20 text-emerald-300' : (p.status === 'delivering' ? 'bg-sky-500/20 text-sky-300' : 'bg-amber-500/20 text-amber-300')}">
+            listEl.innerHTML = displayList.map(p => {
+                const srcInfo = p.source === 'external'
+                    ? `Eksternal: ${escapeHtml(p.vendor || '-')} (${escapeHtml(p.originLocation || '-')})`
+                    : `Internal: ${escapeHtml(p.senderInternal || '-')} (${escapeHtml(p.roomSender || '-')})`;
+                return `
+                <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap justify-between items-start gap-3 trx-info-card">
+                    <div class="flex items-start space-x-3 flex-1 min-w-[260px]">
+                        <span class="px-3 py-1 rounded-xl font-mono font-extrabold text-xs shrink-0 ${p.status === 'completed' ? 'bg-emerald-500/20 text-emerald-300' : (p.status === 'delivering' ? 'bg-sky-500/20 text-sky-300' : 'bg-amber-500/20 text-amber-300')}">
                             ${p.status === 'completed' ? 'DITERIMA' : (p.status === 'delivering' ? 'DIANTAR KURIR' : 'DI POS PIKET')}
                         </span>
-                        <div>
-                            <h4 class="text-base font-extrabold text-white">${p.recipient} <span class="text-xs font-semibold text-indigo-400">(${p.role})</span></h4>
-                            <p class="text-xs text-slate-400">Tujuan: <strong class="text-slate-200">${p.destination}</strong> • Kurir: <strong class="text-sky-300">${p.courier || 'Menunggu'}</strong></p>
+                        <div class="space-y-1">
+                            <h4 class="text-base font-extrabold text-white break-words">${escapeHtml(p.recipient)} <span class="text-xs font-semibold text-indigo-400">(${escapeHtml(p.role)})</span></h4>
+                            <p class="text-xs text-slate-300 break-words">Tujuan: <strong class="text-rose-400">${escapeHtml(p.destination)}</strong> • Kategori: <strong class="uppercase text-amber-300">${escapeHtml(p.category || '-')}</strong> • SLA: <strong class="text-indigo-300">${escapeHtml(p.sla || '-')}</strong></p>
+                            <p class="text-xs text-slate-400 break-words">Sumber: <strong class="text-slate-200">${srcInfo}</strong> • Petugas: <strong class="text-slate-200">${escapeHtml(p.petugas || '-')}</strong> • Kurir: <strong class="text-sky-300">${escapeHtml(p.courier || 'Menunggu')}</strong></p>
+                            ${p.notes && p.notes !== '-' ? `<p class="text-xs text-amber-300/90 break-words"><i class="fa-solid fa-note-sticky mr-1"></i>Catatan: ${escapeHtml(p.notes)}</p>` : ''}
                         </div>
                     </div>
-                    <div class="text-right">
-                        <div class="font-mono text-xs text-indigo-300 font-bold">${p.id}</div>
-                        <div class="text-[11px] text-slate-400">${p.completedTimestamp || p.timestamp}</div>
+                    <div class="text-right shrink-0">
+                        <div class="font-mono text-xs text-indigo-300 font-bold">${escapeHtml(p.id)}</div>
+                        <div class="font-mono text-[11px] text-slate-400">Resi: ${escapeHtml(p.resi || '-')}</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">Masuk: ${escapeHtml(p.timestamp || '-')}</div>
+                        ${(p.status === 'completed' && p.completedTimestamp) ? `<div class="text-[11px] text-emerald-400 font-semibold">Selesai: ${escapeHtml(p.completedTimestamp)}</div>` : ''}
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function formatTimestampIndo(ms) {
@@ -1416,10 +1616,10 @@
                 escapeCsv(p.source === 'external' ? (p.vendor || '-') : (p.senderInternal || '-')),
                 escapeCsv(p.source === 'external' ? (p.originLocation || '-') : (p.roomSender || '-')),
                 escapeCsv(p.petugas || '-'), escapeCsv(p.courier || '-'), escapeCsv(p.recipient || '-'),
-                escapeCsv(p.role || '-'), escapeCsv(p.destination || '-'), escapeCsv(p.phone || '-'),
+                escapeCsv(p.role || '-'), escapeCsv(p.destination || '-'), escapeCsv(currentRole === 'admin' ? (p.phone || '-') : maskPhoneNumber(p.phone || '-')),
                 escapeCsv(p.category || '-'), escapeCsv(p.sla || '-'), escapeCsv(p.notes || '-'),
-                escapeCsv(p.status || '-'), escapeCsv(p.completionOption || p.exceptionStatus || '-'),
-                escapeCsv(p.timestamp || '-'), escapeCsv(p.completedTimestamp || '-')
+                escapeCsv(p.status || '-'), escapeCsv(p.status === 'completed' ? (p.completionOption || 'Selesai') : (p.exceptionStatus || '-')),
+                escapeCsv(p.timestamp || '-'), escapeCsv(p.status === 'completed' ? (p.completedTimestamp || '-') : '-')
             ].join(','));
             const csvString = "\uFEFF" + headers.map(escapeCsv).join(',') + "\r\n" + rows.join("\r\n");
             const url = URL.createObjectURL(new Blob([csvString], { type: 'text/csv;charset=utf-8;' }));
@@ -1544,11 +1744,54 @@
             return canvas.toDataURL('image/jpeg', quality);
         }
 
-        let members = [{ id: 'usr-superadm', name: 'Administrator', username: 'admin', email: 'admin', password: '123456', role: 'admin', status: 'Aktif' }];
+        let members = [
+            { id: 'usr-superadm', name: 'Administrator', username: 'admin', email: 'admin', password: '123456', role: 'admin', status: 'Aktif' },
+            { id: 'usr-aufah', name: 'Aufah (Kurir & Petugas)', username: 'aufah', email: 'aufah', password: '123456', role: 'kurir', status: 'Aktif' }
+        ];
         let packages = [];
         let auditLogs = [];
         let resetRequests = [];
         let currentBroadcast = { text: '', updatedAt: '' };
+
+        function saveLocalCache() {
+            try {
+                localStorage.setItem('kurir_bns_cache_packages', JSON.stringify(packages.slice(0, 150)));
+                localStorage.setItem('kurir_bns_cache_members', JSON.stringify(members));
+                localStorage.setItem('kurir_bns_cache_directory', JSON.stringify(schoolDirectory));
+                localStorage.setItem('kurir_bns_cache_audit', JSON.stringify(auditLogs.slice(0, 100)));
+                localStorage.setItem('kurir_bns_cache_resets', JSON.stringify(resetRequests.slice(0, 100)));
+            } catch (e) {}
+        }
+
+        function loadLocalCache() {
+            try {
+                const cPkgs = JSON.parse(localStorage.getItem('kurir_bns_cache_packages') || 'null');
+                if (Array.isArray(cPkgs) && cPkgs.length > 0) {
+                    packages = cPkgs.filter(p => !deletedPkgBlacklist.has(String(p.id)));
+                }
+                const cMem = JSON.parse(localStorage.getItem('kurir_bns_cache_members') || 'null');
+                if (Array.isArray(cMem) && cMem.length > 0) members = cMem;
+                const cDir = JSON.parse(localStorage.getItem('kurir_bns_cache_directory') || 'null');
+                if (Array.isArray(cDir) && cDir.length > 0) schoolDirectory = cDir;
+                const cAud = JSON.parse(localStorage.getItem('kurir_bns_cache_audit') || 'null');
+                if (Array.isArray(cAud) && cAud.length > 0) auditLogs = cAud;
+                const cRst = JSON.parse(localStorage.getItem('kurir_bns_cache_resets') || 'null');
+                if (Array.isArray(cRst) && cRst.length > 0) resetRequests = cRst;
+            } catch (e) {}
+        }
+
+        function updateConnectionBadge(isOnline, customLabel = null) {
+            const dot = document.getElementById('connection-dot');
+            const text = document.getElementById('connection-text');
+            if (dot) {
+                dot.className = isOnline
+                    ? "w-1.5 h-1.5 rounded-full bg-emerald-400 connection-indicator inline-block"
+                    : "w-1.5 h-1.5 rounded-full bg-amber-400 connection-indicator inline-block";
+            }
+            if (text) {
+                text.innerText = customLabel || (isOnline ? `Cloud Sync (${packages.length} Paket)` : `Local Sync (${packages.length} Paket)`);
+            }
+        }
 
         function getMemberUsername(m) {
             if (!m) return '';
@@ -1570,7 +1813,7 @@
             const editCourierSelect = document.getElementById('edit-pkg-courier');
             const couriers = members.filter(m => m.role === 'kurir' && m.status !== 'Nonaktif');
             const optionsHtml = `<option value="Belum Ditugaskan">-- Antrian Terbuka --</option>` +
-                couriers.map(c => `<option value="${c.name}">${c.name} (Kurir)</option>`).join('');
+                couriers.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)} (Kurir)</option>`).join('');
             if (courierSelect) {
                 const currentVal = courierSelect.value;
                 courierSelect.innerHTML = optionsHtml;
@@ -1588,11 +1831,13 @@
                     }
                 });
                 recipientDatalist.innerHTML = Array.from(uniqueRecipients.values())
-                    .map(r => `<option value="${String(r.name).replace(/"/g, '&quot;')}">${r.role}${r.room ? ' - ' + r.room : ''}</option>`).join('');
+                    .map(r => `<option value="${escapeHtml(r.name)}">${escapeHtml(r.role)}${r.room ? ' - ' + escapeHtml(r.room) : ''}</option>`).join('');
             }
         }
 
         window.renderAdminDirectory = function() {
+            const countLabel = document.getElementById('dir-total-count-label');
+            if (countLabel) countLabel.innerText = schoolDirectory.length;
             const tbody = document.getElementById('admin-directory-table-body');
             if (!tbody) return;
             if (schoolDirectory.length === 0) {
@@ -1601,13 +1846,13 @@
             }
             tbody.innerHTML = schoolDirectory.map(d => `
                 <tr class="hover:bg-slate-50 transition">
-                    <td class="p-2 font-bold text-slate-800">${d.name}</td>
-                    <td class="p-2"><span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold text-[8px]">${d.role}</span></td>
-                    <td class="p-2 font-semibold text-rose-600">${d.room}</td>
-                    <td class="p-2 font-mono text-emerald-700">${d.phone || '-'}</td>
+                    <td class="p-2 font-bold text-slate-800">${escapeHtml(d.name)}</td>
+                    <td class="p-2"><span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold text-[8px]">${escapeHtml(d.role)}</span></td>
+                    <td class="p-2 font-semibold text-rose-600">${escapeHtml(d.room)}</td>
+                    <td class="p-2 font-mono text-emerald-700" title="Klik Edit untuk melihat nomor penuh">${maskPhoneNumber(d.phone)}</td>
                     <td class="p-2 text-right space-x-1.5">
-                        <button type="button" onclick="window.openDirectoryModal('${d.id}')" class="px-2 py-1 rounded bg-indigo-50 text-indigo-600 hover:bg-indigo-100"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button type="button" onclick="window.deleteDirectoryItem('${d.id}')" class="px-2 py-1 rounded bg-rose-50 text-rose-600 hover:bg-rose-100"><i class="fa-solid fa-trash"></i></button>
+                        <button type="button" onclick="window.openDirectoryModal('${escapeHtml(d.id)}')" class="px-2 py-1 rounded bg-indigo-50 text-indigo-600 hover:bg-indigo-100"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button type="button" onclick="window.deleteDirectoryItem('${escapeHtml(d.id)}')" class="px-2 py-1 rounded bg-rose-50 text-rose-600 hover:bg-rose-100"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -1635,8 +1880,9 @@
             let dirObj = editId ? schoolDirectory.find(d => d.id === editId) : null;
             if (dirObj) { Object.assign(dirObj, { name, role, room, phone }); }
             else { dirObj = { id: 'dir-' + Date.now(), name, role, room, phone }; schoolDirectory.push(dirObj); }
+            saveLocalCache();
             if (db && dirObj) {
-                try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'directory_col', String(dirObj.id)), dirObj, { merge: true }); } catch (err) {}
+                setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'directory_col', String(dirObj.id)), dirObj, { merge: true }).catch(() => {});
             }
             updateCourierAndRecipientDropdowns();
             window.renderAdminDirectory();
@@ -1647,11 +1893,74 @@
         window.deleteDirectoryItem = function(id) {
             window.openCustomConfirm('Hapus Kontak Direktori', 'Yakin ingin menghapus kontak ini?', async () => {
                 schoolDirectory = schoolDirectory.filter(d => d.id !== id);
-                if (db) { try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'directory_col', String(id))); } catch (e) {} }
+                saveLocalCache();
+                if (db) { deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'directory_col', String(id))).catch(() => {}); }
                 updateCourierAndRecipientDropdowns();
                 window.renderAdminDirectory();
                 showToast('Kontak dihapus');
             });
+        };
+
+        window.downloadDirectoryCsvTemplate = function() {
+            const csvContent = "\uFEFFNama Lengkap,Peran (Teacher/Staff/Student),Ruangan Default,Nomor WhatsApp\r\n" +
+                "\"Budi Santoso, S.Pd\",Teacher,Ruang Guru,081234567801\r\n" +
+                "\"Siti Rahma, M.Pd\",Teacher,Ruang Kepala Sekolah,081234567802\r\n" +
+                "\"Ahmad Fauzi\",Student,Kelas XII IPA 1,081234567899\r\n";
+            const url = URL.createObjectURL(new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Template_Direktori_Sekolah_BNS.csv";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showToast('Template CSV Direktori berhasil diunduh!');
+        };
+
+        window.handleImportDirectoryCsv = function(e) {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                try {
+                    const text = String(evt.target.result || '');
+                    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                    if (lines.length <= 1) {
+                        showToast('File CSV kosong atau tidak memiliki baris data!', 'error');
+                        return;
+                    }
+                    let importedCount = 0;
+                    for (let i = 1; i < lines.length; i++) {
+                        // Parse CSV row supporting quotes
+                        const cols = lines[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g)?.map(c => c.replace(/^"|"$/g, '').trim()) || lines[i].split(',').map(c => c.trim());
+                        const name = cols[0] || '';
+                        if (!name) continue;
+                        const rawRole = (cols[1] || 'Teacher').trim();
+                        const role = ['Teacher', 'Staff', 'Student'].find(r => r.toLowerCase() === rawRole.toLowerCase()) || 'Teacher';
+                        const room = cols[2] || 'Ruang Guru';
+                        const phone = cols[3] || '';
+                        const existing = schoolDirectory.find(d => d.name.toLowerCase() === name.toLowerCase());
+                        if (existing) {
+                            Object.assign(existing, { role, room, phone });
+                            if (db) setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'directory_col', String(existing.id)), existing, { merge: true }).catch(() => {});
+                        } else {
+                            const newObj = { id: 'dir-' + Date.now() + '-' + i, name, role, room, phone };
+                            schoolDirectory.push(newObj);
+                            if (db) setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'directory_col', String(newObj.id)), newObj, { merge: true }).catch(() => {});
+                        }
+                        importedCount++;
+                    }
+                    saveLocalCache();
+                    updateCourierAndRecipientDropdowns();
+                    window.renderAdminDirectory();
+                    addAuditLog(`Admin (${loggedUser.name}) mengimpor ${importedCount} kontak ke Direktori Sekolah via CSV`, loggedUser.name, 'ADMIN');
+                    showToast(`${importedCount} kontak berhasil diimpor ke Direktori Sekolah!`);
+                } catch (err) {
+                    showToast('Gagal membaca file CSV Direktori!', 'error');
+                } finally {
+                    e.target.value = '';
+                }
+            };
+            reader.readAsText(file);
         };
 
         window.openCustomConfirm = function(title, message, onConfirm) {
@@ -1704,15 +2013,16 @@
             reader.readAsDataURL(file);
         };
 
-        window.handleUpdateOwnPassword = function(e) {
+        window.handleUpdateOwnPassword = async function(e) {
             e.preventDefault();
             const newPwd = document.getElementById('profile-new-password').value;
             if (!newPwd) return;
+            const hashedPwd = await hashPasswordSha256(newPwd);
             const m = members.find(item => matchesMemberLogin(item, loggedUser.username || loggedUser.email));
-            if (m) { m.password = newPwd; syncMemberToFirebase(m); }
-            addAuditLog(`Pengguna (${loggedUser.name}) memperbarui kata sandi profil`, loggedUser.name, currentRole.toUpperCase());
+            if (m) { m.password = hashedPwd; await syncMemberToFirebase(m); }
+            addAuditLog(`Pengguna (${loggedUser.name}) memperbarui kata sandi profil (Terenkripsi SHA-256)`, loggedUser.name, currentRole.toUpperCase());
             window.closeProfileModal();
-            showToast('Kata sandi berhasil disimpan!');
+            showToast('Kata sandi berhasil dienkripsi & disimpan!');
         };
 
         window.openForgotPasswordModal = function() {
@@ -1722,19 +2032,35 @@
 
         window.closeForgotPasswordModal = function() { document.getElementById('forgot-password-modal').classList.add('hidden'); };
 
-        window.handleSubmitForgotPassword = function(e) {
+        async function syncResetRequestToFirebase(reqObj) {
+            saveLocalCache();
+            if (!db || !reqObj) return;
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'reset_requests_col', String(reqObj.id)), reqObj, { merge: true });
+            } catch (e) {}
+        }
+
+        window.handleSubmitForgotPassword = async function(e) {
             e.preventDefault();
             const usernameInput = document.getElementById('forgot-email-input').value.trim();
             const reason = document.getElementById('forgot-reason-input').value.trim() || 'Lupa kata sandi';
             const found = members.find(m => matchesMemberLogin(m, usernameInput));
-            resetRequests.unshift({
-                id: 'rst-' + Date.now(), name: found ? found.name : 'Pengguna',
-                email: found ? getMemberUsername(found) : usernameInput, reason,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' WIB', status: 'Pending'
-            });
+            const nowMs = Date.now();
+            const reqObj = {
+                id: 'rst-' + nowMs,
+                name: found ? found.name : 'Pengguna',
+                email: found ? getMemberUsername(found) : usernameInput,
+                reason,
+                time: formatTimestampIndo(nowMs),
+                timestampRaw: nowMs,
+                status: 'Pending'
+            };
+            resetRequests.unshift(reqObj);
+            await syncResetRequestToFirebase(reqObj);
+            addAuditLog(`Pengajuan reset kata sandi untuk akun @${reqObj.email} (${reason})`, reqObj.name, 'SYSTEM');
             window.renderAdminResets();
             window.closeForgotPasswordModal();
-            showToast('Permintaan reset sandi terkirim ke Admin!');
+            showToast('Permintaan reset sandi terkirim ke Admin secara realtime!');
         };
 
         window.handleRecipientAutoComplete = function(val) {
@@ -1767,7 +2093,7 @@
 
         window.getSlaBadgeHtml = function(pkg) {
             if (pkg.status === 'completed') return `<span class="px-1.5 py-0.2 rounded text-[7.5px] font-bold bg-emerald-100 text-emerald-700"><i class="fa-solid fa-check-double mr-0.5"></i>SLA Tuntas</span>`;
-            if (pkg.exceptionStatus) return `<span class="px-1.5 py-0.2 rounded text-[7.5px] font-bold bg-rose-100 text-rose-700 border border-rose-300"><i class="fa-solid fa-triangle-exclamation mr-0.5"></i>${pkg.exceptionStatus}</span>`;
+            if (pkg.exceptionStatus) return `<span class="px-1.5 py-0.2 rounded text-[7.5px] font-bold bg-rose-100 text-rose-700 border border-rose-300"><i class="fa-solid fa-triangle-exclamation mr-0.5"></i>${escapeHtml(pkg.exceptionStatus)}</span>`;
             const remainMin = getPackageSlaRemainMinutes(pkg);
             const formatDur = (mins) => {
                 const a = Math.abs(mins);
@@ -1785,8 +2111,10 @@
             if (!p) return;
             let phone = (p.phone || '081234567801').replace(/\D/g, '');
             if (phone.startsWith('0')) phone = '62' + phone.slice(1);
+            const pinCode = getOrCreatePackagePin(p);
             const statusLabel = p.status === 'completed' ? `SUDAH DITERIMA (${p.completionOption || 'Selesai'})` : (p.status === 'delivering' ? `SEDANG DIANTAR oleh Kurir ${p.courier}` : `TELAH TIBA di Pos Logistik Sekolah`);
-            const text = `Halo *${p.recipient}*,\nInfo layanan *Kurir BNS Express Sekolah*:\n\n📦 *ID:* ${p.id}\n🔖 *Resi:* ${p.resi || '-'}\n📍 *Tujuan:* ${p.destination}\n⚡ *Status:* ${statusLabel}\n\nTerima kasih.`;
+            const pinLine = p.status === 'completed' ? '' : `\n🔐 *PIN Konfirmasi Terima:* *${pinCode}*`;
+            const text = `Halo *${p.recipient}*,\nInfo layanan *Kurir BNS Express Sekolah*:\n\n📦 *ID:* ${p.id}\n🔖 *Resi:* ${p.resi || '-'}\n📍 *Tujuan:* ${p.destination}\n⚡ *Status:* ${statusLabel}${pinLine}\n\nTerima kasih.`;
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
         };
 
@@ -1798,6 +2126,8 @@
             document.getElementById('qr-label-recipient').innerText = `${p.recipient} (${p.role})`;
             document.getElementById('qr-label-dest').innerText = p.destination;
             document.getElementById('qr-label-sla').innerText = p.sla;
+            const qrPinEl = document.getElementById('qr-label-pin');
+            if (qrPinEl) qrPinEl.innerText = getOrCreatePackagePin(p);
             document.getElementById('qr-label-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(p.resi || p.id)}`;
             document.getElementById('qr-label-modal').classList.remove('hidden');
         };
@@ -1808,6 +2138,59 @@
             document.body.classList.add('printing-qr');
             window.print();
             setTimeout(() => document.body.classList.remove('printing-qr'), 500);
+        };
+
+        window.openManifestModal = function() {
+            const courierName = loggedUser.name || 'Kurir Bertugas';
+            const delivPkgs = packages.filter(p => p.status === 'delivering');
+            const pendPkgs = packages.filter(p => p.status === 'pending');
+            const manifestList = selectedCourierPkgIds.size > 0
+                ? packages.filter(p => selectedCourierPkgIds.has(p.id))
+                : (delivPkgs.length > 0 ? delivPkgs : pendPkgs);
+
+            document.getElementById('manifest-subtitle-info').innerText = `Petugas / Kurir: ${courierName} • Dicetak dari Sistem Logistik Kurir BNS Express`;
+            document.getElementById('manifest-date-info').innerText = formatTimestampIndo(Date.now());
+            document.getElementById('manifest-count-info').innerText = `Total: ${manifestList.length} Paket`;
+            document.getElementById('manifest-sign-courier').innerText = `( ${courierName} )`;
+
+            const tbody = document.getElementById('manifest-table-body');
+            if (tbody) {
+                if (manifestList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada paket aktif untuk dicetak di Surat Jalan.</td></tr>`;
+                } else {
+                    tbody.innerHTML = manifestList.map((p, idx) => `
+                        <tr class="border-b border-slate-300">
+                            <td class="p-1.5 border border-slate-300 text-center font-bold">${idx + 1}</td>
+                            <td class="p-1.5 border border-slate-300 font-mono">
+                                <div class="font-bold text-indigo-900">${escapeHtml(p.id)}</div>
+                                <div class="text-[7.5px] text-slate-500">Resi: ${escapeHtml(p.resi || '-')}</div>
+                            </td>
+                            <td class="p-1.5 border border-slate-300">
+                                <div class="font-bold">${escapeHtml(p.recipient)} (${escapeHtml(p.role)})</div>
+                                <div class="text-rose-700 font-semibold">Tujuan: ${escapeHtml(p.destination)}</div>
+                            </td>
+                            <td class="p-1.5 border border-slate-300">
+                                <div class="uppercase font-bold text-[7.5px]">${escapeHtml(p.category || 'barang')} • ${escapeHtml(p.sla || '-')}</div>
+                                ${p.isCod ? `<div class="text-rose-700 font-extrabold text-[8px]">TAGIHAN COD: ${escapeHtml(p.codAmount || 'Ya')}</div>` : ''}
+                                <div class="text-[7.5px] text-slate-600">${escapeHtml(p.notes || '-')}</div>
+                            </td>
+                            <td class="p-1.5 border border-slate-300 text-center font-mono font-extrabold text-emerald-800">${escapeHtml(getOrCreatePackagePin(p))}</td>
+                            <td class="p-1.5 border border-slate-300 h-10 align-bottom text-center text-[7px] text-slate-400">.................................</td>
+                        </tr>
+                    `).join('');
+                }
+            }
+            document.getElementById('manifest-modal')?.classList.remove('hidden');
+        };
+
+        window.closeManifestModal = function() {
+            document.getElementById('manifest-modal')?.classList.add('hidden');
+        };
+
+        window.printCourierManifest = function() {
+            document.body.classList.add('printing-manifest');
+            window.print();
+            setTimeout(() => document.body.classList.remove('printing-manifest'), 500);
         };
 
         let sigCanvas = null, sigCtx = null, isDrawingSig = false, hasSignatureStroke = false;
@@ -1849,22 +2232,47 @@
                 container.innerHTML = `<div class="text-center py-4 text-slate-400 text-[9px]">Belum ada permintaan reset kata sandi.</div>`;
                 return;
             }
-            container.innerHTML = resetRequests.map(r => `
-                <div class="p-2 rounded-lg border bg-slate-50 flex justify-between items-center text-[9px]">
-                    <div><strong>${r.name}</strong> (${r.email}) • ${r.reason}</div>
-                    ${r.status === 'Pending' ? `<button type="button" onclick="window.approveResetRequest('${r.id}')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded text-[8px]">Reset ke 123456</button>` : `<span class="text-emerald-700 font-bold">Sudah Direset</span>`}
-                </div>
-            `).join('');
+            container.innerHTML = resetRequests.map(r => {
+                const safeId = String(r.id).replace(/'/g, "\'");
+                return `
+                <div class="p-2.5 rounded-xl border bg-slate-50 flex flex-wrap justify-between items-center gap-2 text-[9px]">
+                    <div>
+                        <div><strong>${escapeHtml(r.name)}</strong> (<span class="font-mono text-indigo-600">@${escapeHtml(r.email)}</span>) • ${escapeHtml(r.reason)}</div>
+                        <div class="text-[8px] text-slate-400 font-mono mt-0.5">${escapeHtml(r.time || '')}</div>
+                    </div>
+                    <div class="flex items-center space-x-1.5">
+                        ${r.status === 'Pending'
+                            ? `<button type="button" onclick="window.approveResetRequest('${safeId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-lg text-[8px] shadow-sm">Reset ke 123456</button>`
+                            : `<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[8px]">Sudah Direset</span>`}
+                        <button type="button" onclick="window.deleteResetRequest('${safeId}')" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-[8px]" title="Hapus Permintaan"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
         };
 
-        window.approveResetRequest = function(reqId) {
-            const req = resetRequests.find(r => r.id === reqId);
+        window.approveResetRequest = async function(reqId) {
+            const req = resetRequests.find(r => String(r.id) === String(reqId));
             if (!req) return;
             req.status = 'Selesai';
+            await syncResetRequestToFirebase(req);
             const m = members.find(item => matchesMemberLogin(item, req.email));
-            if (m) { m.password = '123456'; syncMemberToFirebase(m); }
+            if (m) {
+                m.password = await hashPasswordSha256('123456');
+                await syncMemberToFirebase(m);
+            }
+            addAuditLog(`Admin (${loggedUser.name}) menyetujui reset sandi akun @${req.email} ke default (123456)`, loggedUser.name, 'ADMIN');
             window.renderAdminResets();
-            showToast(`Sandi ${req.email} direset ke 123456`);
+            showToast(`Sandi @${req.email} berhasil direset ke 123456`);
+        };
+
+        window.deleteResetRequest = async function(reqId) {
+            resetRequests = resetRequests.filter(r => String(r.id) !== String(reqId));
+            saveLocalCache();
+            if (db) {
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'reset_requests_col', String(reqId))); } catch (e) {}
+            }
+            window.renderAdminResets();
+            showToast('Permintaan reset sandi dihapus');
         };
 
         window.handleLoginEmailInput = function(val) {
@@ -1936,11 +2344,18 @@
             };
             try {
                 const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
+                db = initializeFirestore(app, {
+                    experimentalForceLongPolling: true,
+                    ignoreUndefinedProperties: true
+                });
                 auth = getAuth(app);
                 setupRealtimeSync();
-                signInAnonymously(auth).catch(() => {});
-            } catch (e) {}
+                signInAnonymously(auth).catch(() => {
+                    updateConnectionBadge(false);
+                });
+            } catch (e) {
+                updateConnectionBadge(false);
+            }
         }
 
         function setupRealtimeSync() {
@@ -1966,11 +2381,15 @@
                         if (newestPkg) sendSystemBannerNotification(`📦 Paket Baru: ${newestPkg.recipient}`, `Tujuan: ${newestPkg.destination}`);
                     }
                     lastPackageCount = sortedCloud.length;
-                    packages = sortedCloud;
-                    const statusText = document.getElementById('connection-text');
-                    if (statusText) statusText.innerText = `Cloud Sync (${packages.length} Paket)`;
+                    if (sortedCloud.length > 0 || packages.length === 0) {
+                        packages = sortedCloud;
+                        saveLocalCache();
+                    }
+                    updateConnectionBadge(!snapshot.metadata.fromCache);
                     updateCourierAndRecipientDropdowns();
                     refreshActiveView();
+                }, () => {
+                    updateConnectionBadge(false);
                 });
 
                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'members_col'), (snapshot) => {
@@ -1985,20 +2404,22 @@
                         if (!members.some(m => matchesMemberLogin(m, 'admin'))) {
                             members.unshift({ id: 'usr-superadm', name: 'Administrator', username: 'admin', email: 'admin', password: '123456', role: 'admin', status: 'Aktif' });
                         }
+                        saveLocalCache();
                     }
                     updateCourierAndRecipientDropdowns();
                     if (currentRole === 'admin') renderAdminMembers();
-                });
+                }, () => {});
 
                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'directory_col'), (snapshot) => {
                     const cloudDir = [];
                     snapshot.forEach(docSnap => cloudDir.push(docSnap.data()));
                     if (cloudDir.length > 0) {
                         schoolDirectory = cloudDir;
+                        saveLocalCache();
                         updateCourierAndRecipientDropdowns();
                         if (currentRole === 'admin') window.renderAdminDirectory();
                     }
-                });
+                }, () => {});
 
                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'settings_col'), (snapshot) => {
                     snapshot.forEach(docSnap => {
@@ -2007,22 +2428,37 @@
                             updateGlobalBroadcastBanner();
                         }
                     });
-                });
+                }, () => {});
 
                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'audit_logs_col'), (snapshot) => {
                     const cloudLogs = [];
                     snapshot.forEach(docSnap => cloudLogs.push(docSnap.data()));
-                    auditLogs = cloudLogs.sort((a,b) => (b.timestampRaw || 0) - (a.timestampRaw || 0));
-                    window.renderAuditLogs();
-                });
-            } catch (e) {}
+                    if (cloudLogs.length > 0) {
+                        auditLogs = cloudLogs.sort((a,b) => (b.timestampRaw || 0) - (a.timestampRaw || 0));
+                        saveLocalCache();
+                        window.renderAuditLogs();
+                    }
+                }, () => {});
+
+                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'reset_requests_col'), (snapshot) => {
+                    const cloudResets = [];
+                    snapshot.forEach(docSnap => cloudResets.push(docSnap.data()));
+                    resetRequests = cloudResets.sort((a,b) => (b.timestampRaw || 0) - (a.timestampRaw || 0));
+                    saveLocalCache();
+                    window.renderAdminResets();
+                }, () => {});
+            } catch (e) {
+                updateConnectionBadge(false);
+            }
         }
 
         async function syncPackageToFirebase(pkgObj) {
-            if (!db || !pkgObj) return false;
+            if (!pkgObj) return false;
+            deletedPkgBlacklist.delete(String(pkgObj.id));
+            saveLocalCache();
+            if (!db) return false;
             try {
-                deletedPkgBlacklist.delete(String(pkgObj.id));
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'packages_col', String(pkgObj.id)), pkgObj, { merge: true });
+                setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'packages_col', String(pkgObj.id)), pkgObj, { merge: true }).catch(() => {});
                 return true;
             } catch (e) { return false; }
         }
@@ -2035,12 +2471,13 @@
             packages = packages.filter(p => String(p.id) !== targetId && String(p._docId || '') !== docKey);
             selectedAdminPkgIds.delete(targetId);
             selectedCourierPkgIds.delete(targetId);
+            saveLocalCache();
 
             if (db) {
                 try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'packages_col', targetId));
+                    deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'packages_col', targetId)).catch(() => {});
                     if (docKey && docKey !== targetId) {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'packages_col', docKey));
+                        deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'packages_col', docKey)).catch(() => {});
                     }
                 } catch (e) {}
             }
@@ -2069,12 +2506,12 @@
         };
 
         window.downloadDatabaseBackup = function() {
-            const backupData = { app: 'Kurir BNS Sekolah', version: '4.4', exportedAt: new Date().toISOString(), packages, members, schoolDirectory, auditLogs };
+            const backupData = { app: 'Kurir BNS Sekolah', version: '4.4.9', exportedAt: new Date().toISOString(), packages, members, schoolDirectory, resetRequests, auditLogs };
             const a = document.createElement('a');
             a.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2)));
             a.setAttribute("download", "kurir_bns_backup_" + new Date().toISOString().slice(0,10) + ".json");
             document.body.appendChild(a); a.click(); a.remove();
-            showToast('Backup database diunduh!');
+            showToast('Backup database lengkap berhasil diunduh!');
         };
 
         window.handleRestoreDatabase = function(e) {
@@ -2086,21 +2523,31 @@
                     const parsed = JSON.parse(ev.target.result);
                     if (Array.isArray(parsed.packages)) packages = parsed.packages;
                     if (Array.isArray(parsed.members)) members = parsed.members;
+                    if (Array.isArray(parsed.schoolDirectory)) schoolDirectory = parsed.schoolDirectory;
+                    if (Array.isArray(parsed.resetRequests)) resetRequests = parsed.resetRequests;
+                    if (Array.isArray(parsed.auditLogs)) auditLogs = parsed.auditLogs;
+                    saveLocalCache();
                     if (db) {
                         for (const p of packages) await syncPackageToFirebase(p);
                         for (const m of members) await syncMemberToFirebase(m);
+                        for (const d of schoolDirectory) {
+                            try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'directory_col', String(d.id)), d, { merge: true }); } catch (e) {}
+                        }
+                        for (const r of resetRequests) await syncResetRequestToFirebase(r);
                     }
+                    updateCourierAndRecipientDropdowns();
                     window.closeBackupModal();
                     refreshActiveView();
-                    showToast('Database berhasil dipulihkan!');
+                    showToast('Database lengkap berhasil dipulihkan!');
                 } catch (err) { showToast('File backup tidak valid!', 'error'); }
             };
             reader.readAsText(file);
         };
 
         async function syncMemberToFirebase(memberObj) {
+            saveLocalCache();
             if (!db) return;
-            try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'members_col', String(memberObj.id)), memberObj, { merge: true }); } catch (e) {}
+            try { setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'members_col', String(memberObj.id)), memberObj, { merge: true }).catch(() => {}); } catch (e) {}
         }
 
         async function addAuditLog(actionText, actorName = null, actorRole = null) {
@@ -2113,21 +2560,21 @@
                 action: actionText
             };
             auditLogs.unshift(logEntry);
+            saveLocalCache();
             window.renderAuditLogs();
-            if (db) { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'audit_logs_col', String(logEntry.id)), logEntry); } catch(e) {} }
+            if (db) { try { setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'audit_logs_col', String(logEntry.id)), logEntry).catch(() => {}); } catch(e) {} }
         }
 
-        function showToast(message, type = 'success') {
+        window.showToast = function(message, type = 'success') {
             const container = document.getElementById('toast-container');
             if(!container) return;
             const toast = document.createElement('div');
             const bgClass = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-rose-600' : 'bg-indigo-600');
             toast.className = `p-2.5 rounded-2xl shadow-xl text-[10px] font-bold text-white toast-anim flex items-center space-x-2 pointer-events-auto ${bgClass}`;
-            toast.innerHTML = `<i class="fa-solid fa-circle-info text-xs"></i><span>${message}</span>`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info text-xs"></i><span>${escapeHtml(message)}</span>`;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
-        }
-        window.showToast = showToast;
+        };
 
         window.startVoiceSearch = function(inputId, callbackFn) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -2145,29 +2592,40 @@
 
         window.togglePasswordVisibility = function() {
             const pwdInput = document.getElementById('login-password');
-            if (pwdInput) pwdInput.type = pwdInput.type === 'password' ? 'text' : 'password';
+            const icon = document.getElementById('password-toggle-icon');
+            if (pwdInput) {
+                const isPwd = pwdInput.type === 'password';
+                pwdInput.type = isPwd ? 'text' : 'password';
+                if (icon) icon.className = isPwd ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+            }
         };
 
         window.selectLoginRole = function(role) {
             ['petugas', 'kurir', 'penerima', 'admin'].forEach(r => {
                 const btn = document.getElementById(`login-btn-${r}`);
                 if (btn) btn.className = r === role
-                    ? "p-1.5 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-700 text-[10px] font-bold transition flex flex-col items-center space-y-1 shadow-sm"
-                    : "p-1.5 rounded-xl border-2 border-transparent text-slate-600 text-[10px] font-bold transition flex flex-col items-center space-y-1";
+                    ? "p-1.5 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-700 text-[10px] font-bold transition flex flex-col items-center space-y-1 shadow-sm btn-glow"
+                    : "p-1.5 rounded-xl border-2 border-transparent text-slate-600 text-[10px] font-bold transition flex flex-col items-center space-y-1 hover:bg-white/60";
             });
             const passwordGroup = document.getElementById('password-field-group');
             const passwordInput = document.getElementById('login-password');
+            const labelName = document.getElementById('login-label-name');
+            const userInput = document.getElementById('login-username');
             if (role === 'penerima') {
                 passwordGroup?.classList.add('hidden');
                 if (passwordInput) passwordInput.required = false;
+                if (labelName) labelName.innerText = 'Nama Penerima / Ruangan';
+                if (userInput) userInput.placeholder = 'Ketik nama Anda (cth: Budi Santoso)...';
             } else {
                 passwordGroup?.classList.remove('hidden');
                 if (passwordInput) passwordInput.required = true;
+                if (labelName) labelName.innerText = 'Username';
+                if (userInput) userInput.placeholder = 'Ketik username (cth: admin / aufah)...';
             }
             loggedUser.role = role;
         };
 
-        window.handleLogin = function(e) {
+        window.handleLogin = async function(e) {
             if (e) e.preventDefault();
             const username = document.getElementById('login-username').value.trim();
             const role = loggedUser.role;
@@ -2175,19 +2633,29 @@
                 loggedUser = { name: username, username: username.toLowerCase(), email: username.toLowerCase(), role: 'penerima', isSuperAdmin: false, avatar: `https://placehold.co/100x100/059669/ffffff?text=${encodeURIComponent(username.slice(0,2).toUpperCase())}` };
                 localStorage.setItem('kurir_bns_logged_user', JSON.stringify(loggedUser));
                 document.getElementById('header-user-badge').innerText = `Masuk: ${username} (PENERIMA)`;
+                const recInput = document.getElementById('receiver-session-name');
+                if (recInput) recInput.value = username;
                 runLoginLoadingTransition(loggedUser, () => { window.switchRole('penerima'); });
                 return;
             }
             const password = document.getElementById('login-password').value;
             const foundUser = members.find(m => matchesMemberLogin(m, username));
-            if (!foundUser || foundUser.password !== password) {
-                document.getElementById('login-error-txt') && (document.getElementById('login-error-text').innerText = 'Username atau kata sandi salah.');
+            const isValidPwd = await verifyMemberPassword(foundUser, password);
+            if (!foundUser || !isValidPwd) {
+                const errTextEl = document.getElementById('login-error-text');
+                if (errTextEl) errTextEl.innerText = 'Username atau kata sandi salah.';
                 document.getElementById('login-error-alert')?.classList.remove('hidden');
                 showToast('Username atau kata sandi salah!', 'error');
                 return;
             }
+            // Migrasi otomatis kata sandi plaintext ke SHA-256 saat berhasil login
+            if (foundUser.password && !String(foundUser.password).startsWith('sha256:')) {
+                foundUser.password = await hashPasswordSha256(password);
+                syncMemberToFirebase(foundUser);
+            }
             if (foundUser.status === 'Nonaktif') {
-                document.getElementById('login-error-text').innerText = 'Akun sedang dinonaktifkan sementara oleh Admin.';
+                const errTextEl = document.getElementById('login-error-text');
+                if (errTextEl) errTextEl.innerText = 'Akun sedang dinonaktifkan sementara oleh Admin.';
                 document.getElementById('login-error-alert')?.classList.remove('hidden');
                 showToast('Akun Anda sedang Nonaktif. Hubungi Admin.', 'error');
                 return;
@@ -2227,13 +2695,25 @@
             });
             if (role === 'petugas') { window.switchPetugasTab('input'); window.renderPetugasForm(); }
             if (role === 'kurir') { window.switchCourierSubTab('pending'); window.renderCourierView(); }
-            if (role === 'penerima') window.renderReceiverView();
+            if (role === 'penerima') {
+                const recInput = document.getElementById('receiver-session-name');
+                if (recInput && !recInput.value && !loggedUser.isSuperAdmin && loggedUser.name) {
+                    recInput.value = loggedUser.name;
+                }
+                window.renderReceiverView();
+            }
             if (role === 'admin') { window.switchAdminTab('overview'); renderAdminOverview(); }
         };
 
         window.switchPetugasTab = function(tab) {
             ['input', 'status'].forEach(t => {
                 document.getElementById(`petugas-content-${t}`)?.classList.toggle('hidden', t !== tab);
+                const btn = document.getElementById(`petugas-tab-${t}`);
+                if (btn) {
+                    btn.className = t === tab
+                        ? "flex-1 py-1.5 px-3 rounded-xl text-[10px] font-bold transition bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md flex items-center justify-center space-x-1.5"
+                        : "flex-1 py-1.5 px-3 rounded-xl text-[10px] font-bold transition text-slate-600 hover:bg-white/60 flex items-center justify-center space-x-1.5";
+                }
             });
             if (tab === 'status') window.renderPetugasStatusView();
         };
@@ -2241,14 +2721,30 @@
         window.togglePetugasFullscreen = function() {
             isPetugasFullscreen = !isPetugasFullscreen;
             document.getElementById('petugas-content-status')?.classList.toggle('fullscreen-mode', isPetugasFullscreen);
+            const icon = document.getElementById('petugas-fullscreen-icon');
+            const txt = document.getElementById('petugas-fullscreen-text');
+            if (icon) icon.className = isPetugasFullscreen ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+            if (txt) txt.innerText = isPetugasFullscreen ? 'Keluar Fullscreen' : 'Fullscreen';
         };
 
         window.switchSourceType = function(type) {
             sourceType = type;
+            const btnExt = document.getElementById('btn-src-ext');
+            const btnInt = document.getElementById('btn-src-int');
+            if (btnExt) {
+                btnExt.className = type === 'external'
+                    ? "px-3 py-1 rounded-lg text-[9px] font-bold transition bg-indigo-600 text-white shadow flex items-center space-x-1"
+                    : "px-3 py-1 rounded-lg text-[9px] font-bold transition text-slate-600 hover:text-slate-900 flex items-center space-x-1";
+            }
+            if (btnInt) {
+                btnInt.className = type === 'internal'
+                    ? "px-3 py-1 rounded-lg text-[9px] font-bold transition bg-indigo-600 text-white shadow flex items-center space-x-1"
+                    : "px-3 py-1 rounded-lg text-[9px] font-bold transition text-slate-600 hover:text-slate-900 flex items-center space-x-1";
+            }
             window.renderPetugasForm();
         };
 
-        window.generateUniqueTrxId = function() {
+        window.generateUniqueTrxId = function(persistSeq = false) {
             const now = new Date();
             const dateCode = String(now.getDate()).padStart(2, '0') + String(now.getMonth() + 1).padStart(2, '0') + String(now.getFullYear()).slice(-2);
             let maxSeq = 1000;
@@ -2262,6 +2758,9 @@
             const savedSeq = parseInt(localStorage.getItem(`kurir_bns_last_seq_${dateCode}`) || '1000', 10);
             if (savedSeq > maxSeq) maxSeq = savedSeq;
             const nextSeq = maxSeq + 1;
+            if (persistSeq) {
+                try { localStorage.setItem(`kurir_bns_last_seq_${dateCode}`, String(nextSeq)); } catch (e) {}
+            }
             const salt = Math.random().toString(36).substring(2, 5).toUpperCase();
             return `${prefix}${nextSeq}-${salt}`;
         };
@@ -2269,7 +2768,7 @@
         window.renderPetugasForm = function() {
             const container = document.getElementById('source-fields-container');
             if (!container) return;
-            const trxId = window.generateUniqueTrxId();
+            const trxId = window.generateUniqueTrxId(false);
             const day = new Date().getDay();
             const slaEl = document.getElementById('input-sla');
             if (slaEl && (day === 5 || day === 6)) slaEl.value = '3 hari (akhir pekan / senin)';
@@ -2277,21 +2776,101 @@
             if (sourceType === 'external') {
                 container.innerHTML = `
                     <div><label class="block text-[8.5px] font-semibold mb-0.5">ID Transaksi (Auto)</label><input type="text" id="input-trx" value="${trxId}" readonly class="w-full px-2 py-1 rounded border text-[9.5px] font-mono font-bold bg-slate-100"></div>
-                    <div><label class="block text-[8.5px] font-semibold mb-0.5">No Resi</label><div class="flex space-x-1"><input type="text" id="input-resi" required class="w-full px-2 py-1 rounded border text-[9.5px] font-mono"><button type="button" onclick="window.openBarcodeModal()" class="bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded text-[8.5px] font-bold">Scan</button></div></div>
-                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Vendor / Ekspedisi</label><select id="input-vendor" class="w-full px-2 py-1 rounded border text-[9.5px] bg-white"><option value="Shopee">Shopee</option><option value="Tokopedia">Tokopedia</option><option value="JNE Express">JNE Express</option><option value="J&T Express">J&T Express</option><option value="GoSend / Grab">GoSend / Grab</option><option value="Titipan">Titipan</option></select></div>
-                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Lokasi Asal</label><input type="text" id="input-origin" value="POS 3" required class="w-full px-2 py-1 rounded border text-[9.5px]"></div>
+                    <div><label class="block text-[8.5px] font-semibold mb-0.5">No Resi</label><div class="flex space-x-1"><input type="text" id="input-resi" oninput="window.saveFormDraft()" required class="w-full px-2 py-1 rounded border text-[9.5px] font-mono"><button type="button" onclick="window.openBarcodeModal()" class="bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded text-[8.5px] font-bold">Scan</button></div></div>
+                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Vendor / Ekspedisi</label><select id="input-vendor" onchange="window.saveFormDraft()" class="w-full px-2 py-1 rounded border text-[9.5px] bg-white"><option value="Shopee">Shopee</option><option value="Tokopedia">Tokopedia</option><option value="JNE Express">JNE Express</option><option value="J&T Express">J&T Express</option><option value="GoSend / Grab">GoSend / Grab</option><option value="Titipan">Titipan</option></select></div>
+                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Lokasi Asal</label><input type="text" id="input-origin" oninput="window.saveFormDraft()" value="POS 3" required class="w-full px-2 py-1 rounded border text-[9.5px]"></div>
                 `;
             } else {
                 container.innerHTML = `
                     <div><label class="block text-[8.5px] font-semibold mb-0.5">ID Transaksi (Auto)</label><input type="text" id="input-trx" value="${trxId}" readonly class="w-full px-2 py-1 rounded border text-[9.5px] font-mono font-bold bg-slate-100"></div>
-                    <div><label class="block text-[8.5px] font-semibold mb-0.5">No Referensi</label><input type="text" id="input-resi" value="INT-${trxId.replace('TRX-', '')}" required class="w-full px-2 py-1 rounded border text-[9.5px] font-mono"></div>
-                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Pengirim Internal</label><input type="text" id="input-sender-internal" required placeholder="Nama Pengirim" class="w-full px-2 py-1 rounded border text-[9.5px]"></div>
-                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Ruang Pengirim</label><input type="text" id="input-room-sender" required placeholder="Ruang Guru / TU" class="w-full px-2 py-1 rounded border text-[9.5px]"></div>
+                    <div><label class="block text-[8.5px] font-semibold mb-0.5">No Referensi</label><input type="text" id="input-resi" oninput="window.saveFormDraft()" value="INT-${trxId.replace('TRX-', '')}" required class="w-full px-2 py-1 rounded border text-[9.5px] font-mono"></div>
+                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Pengirim Internal</label><input type="text" id="input-sender-internal" oninput="window.saveFormDraft()" required placeholder="Nama Pengirim" class="w-full px-2 py-1 rounded border text-[9.5px]"></div>
+                    <div><label class="block text-[8.5px] font-semibold mb-0.5">Ruang Pengirim</label><input type="text" id="input-room-sender" oninput="window.saveFormDraft()" required placeholder="Ruang Guru / TU" class="w-full px-2 py-1 rounded border text-[9.5px]"></div>
                 `;
             }
+            window.loadFormDraft();
         };
 
-        window.saveFormDraft = function() {};
+        window.handleCategoryChange = function(catVal) {
+            const slaEl = document.getElementById('input-sla');
+            const foodBadge = document.getElementById('food-sla-badge');
+            if (catVal === 'makanan') {
+                if (slaEl) slaEl.value = '30 menit (cepat)';
+                foodBadge?.classList.remove('hidden');
+                showToast('⚡ Kategori Makanan/Minuman: Prioritas otomatis diset ke 30 menit (cepat)!', 'info');
+            } else {
+                foodBadge?.classList.add('hidden');
+            }
+            window.saveFormDraft();
+        };
+
+        window.handleCodStatusChange = function(val) {
+            const wrap = document.getElementById('input-cod-amount-wrap');
+            if (wrap) wrap.classList.toggle('hidden', val !== 'cod');
+            window.saveFormDraft();
+        };
+
+        window.saveFormDraft = function() {
+            try {
+                const draft = {
+                    sourceType,
+                    resi: document.getElementById('input-resi')?.value || '',
+                    vendor: document.getElementById('input-vendor')?.value || 'Shopee',
+                    origin: document.getElementById('input-origin')?.value || 'POS 3',
+                    senderInternal: document.getElementById('input-sender-internal')?.value || '',
+                    roomSender: document.getElementById('input-room-sender')?.value || '',
+                    recipient: document.getElementById('input-recipient')?.value || '',
+                    role: document.getElementById('input-recipient-role')?.value || 'Student',
+                    destination: document.getElementById('input-destination')?.value || '',
+                    phone: document.getElementById('input-phone')?.value || '',
+                    category: document.getElementById('input-category')?.value || 'dokumen',
+                    sla: document.getElementById('input-sla')?.value || '30 menit (cepat)',
+                    assignCourier: document.getElementById('input-assign-courier')?.value || 'Belum Ditugaskan',
+                    notes: document.getElementById('input-notes')?.value || '',
+                    codStatus: document.getElementById('input-cod-status')?.value || 'non-cod',
+                    codAmount: document.getElementById('input-cod-amount')?.value || ''
+                };
+                localStorage.setItem('kurir_bns_form_draft', JSON.stringify(draft));
+            } catch (e) {}
+        };
+
+        window.loadFormDraft = function() {
+            try {
+                const raw = localStorage.getItem('kurir_bns_form_draft');
+                if (!raw) return;
+                const d = JSON.parse(raw);
+                if (!d || d.sourceType !== sourceType) return;
+                const setVal = (id, val) => {
+                    const el = document.getElementById(id);
+                    if (el && val !== undefined && val !== null && val !== '') el.value = val;
+                };
+                if (sourceType === 'external') {
+                    setVal('input-resi', d.resi);
+                    setVal('input-vendor', d.vendor);
+                    setVal('input-origin', d.origin);
+                } else {
+                    if (d.resi && !d.resi.startsWith('INT-')) setVal('input-resi', d.resi);
+                    setVal('input-sender-internal', d.senderInternal);
+                    setVal('input-room-sender', d.roomSender);
+                }
+                setVal('input-recipient', d.recipient);
+                setVal('input-recipient-role', d.role);
+                setVal('input-destination', d.destination);
+                setVal('input-phone', d.phone);
+                setVal('input-category', d.category);
+                setVal('input-sla', d.sla);
+                setVal('input-assign-courier', d.assignCourier);
+                setVal('input-notes', d.notes);
+                setVal('input-cod-status', d.codStatus || 'non-cod');
+                setVal('input-cod-amount', d.codAmount || '');
+                document.getElementById('input-cod-amount-wrap')?.classList.toggle('hidden', (d.codStatus || 'non-cod') !== 'cod');
+                document.getElementById('food-sla-badge')?.classList.toggle('hidden', d.category !== 'makanan');
+            } catch (e) {}
+        };
+
+        window.clearFormDraft = function() {
+            try { localStorage.removeItem('kurir_bns_form_draft'); } catch (e) {}
+        };
 
         window.openPhysicalCameraModal = function() {
             stopAllActiveMediaStreams();
@@ -2384,18 +2963,50 @@
             reader.readAsDataURL(file);
         };
 
-        window.openBarcodeModal = function() {
+        let barcodeScanMode = 'petugas';
+
+        function processScannedCodeResult(scannedText) {
+            const cleanCode = String(scannedText || '').trim();
+            if (!cleanCode) return;
+            window.closeBarcodeModal();
+
+            if (barcodeScanMode === 'courier') {
+                const matchedPkg = packages.find(p =>
+                    String(p.id || '').toLowerCase() === cleanCode.toLowerCase() ||
+                    String(p.resi || '').toLowerCase() === cleanCode.toLowerCase()
+                );
+                if (!matchedPkg) {
+                    showToast(`Paket dengan kode "${cleanCode}" tidak ditemukan di daftar transaksi!`, 'error');
+                    return;
+                }
+                if (matchedPkg.status === 'pending') {
+                    window.takePackage(matchedPkg.id);
+                    window.switchCourierSubTab('delivering');
+                } else if (matchedPkg.status === 'delivering') {
+                    window.openCompleteModal(matchedPkg.id);
+                } else {
+                    showToast(`Paket ${matchedPkg.id} (${matchedPkg.recipient}) sudah berstatus SELESAI.`, 'info');
+                }
+            } else {
+                const resiInput = document.getElementById('input-resi');
+                if (resiInput) {
+                    resiInput.value = cleanCode;
+                    window.saveFormDraft();
+                }
+                showToast('Barcode berhasil discan: ' + cleanCode);
+            }
+        }
+
+        window.openBarcodeModal = function(mode = 'petugas') {
+            barcodeScanMode = mode;
             stopAllActiveMediaStreams();
             document.getElementById('barcode-modal')?.classList.remove('hidden');
             const videoEl = document.getElementById('interactive-barcode-video');
             if (typeof ZXing !== 'undefined') {
                 codeReader = new ZXing.BrowserMultiFormatReader();
                 codeReader.decodeFromVideoDevice(null, videoEl, (result) => {
-                    if (result) {
-                        const resiInput = document.getElementById('input-resi');
-                        if (resiInput) resiInput.value = result.text;
-                        window.closeBarcodeModal();
-                        showToast('Barcode berhasil discan: ' + result.text);
+                    if (result && result.text) {
+                        processScannedCodeResult(result.text);
                     }
                 });
             }
@@ -2415,10 +3026,8 @@
                 img.onload = function() {
                     const r = new ZXing.BrowserMultiFormatReader();
                     r.decodeFromImageElement(img).then(res => {
-                        document.getElementById('input-resi').value = res.text;
-                        window.closeBarcodeModal();
-                        showToast('Barcode terbaca: ' + res.text);
-                    }).catch(() => showToast('Barcode tidak terbaca pada gambar.', 'error'));
+                        processScannedCodeResult(res.text);
+                    }).catch(() => showToast('Barcode/QR tidak terbaca pada gambar.', 'error'));
                 };
                 img.src = ev.target.result;
             };
@@ -2440,9 +3049,13 @@
             const category = document.getElementById('input-category').value;
             const sla = document.getElementById('input-sla').value;
             const assignCourier = document.getElementById('input-assign-courier').value;
-            const notes = document.getElementById('input-notes').value.trim() || '-';
+            const isCod = document.getElementById('input-cod-status')?.value === 'cod';
+            const codAmount = isCod ? (document.getElementById('input-cod-amount')?.value.trim() || 'COD') : '';
+            const rawNotes = document.getElementById('input-notes').value.trim() || '-';
+            const notes = isCod ? `[TAGIHAN COD: ${codAmount}] ${rawNotes !== '-' ? rawNotes : ''}`.trim() : rawNotes;
             const nowMs = Date.now();
             const timeStr = formatTimestampIndo(nowMs);
+            const verifyPin = String(Math.floor(1000 + Math.random() * 9000));
 
             pendingPackagePayload = {
                 id: trxId, resi, source: sourceType,
@@ -2451,6 +3064,8 @@
                 senderInternal: sourceType === 'internal' ? document.getElementById('input-sender-internal').value : '-',
                 roomSender: sourceType === 'internal' ? document.getElementById('input-room-sender').value : '-',
                 recipient, role, destination, phone, category, sla, notes,
+                isCod, codAmount,
+                verifyPin,
                 petugas: loggedUser.name || 'Petugas',
                 courier: assignCourier,
                 status: assignCourier !== 'Belum Ditugaskan' ? 'delivering' : 'pending',
@@ -2464,6 +3079,8 @@
             document.getElementById('sum-source').innerText = sourceType.toUpperCase();
             document.getElementById('sum-recipient').innerText = `${recipient} (${role})`;
             document.getElementById('sum-dest').innerText = destination;
+            const sumPinEl = document.getElementById('sum-pin');
+            if (sumPinEl) sumPinEl.innerText = verifyPin;
             document.getElementById('sum-petugas').innerText = pendingPackagePayload.petugas;
             document.getElementById('sum-photo').src = physicalPhotoDataUrl;
             document.getElementById('summary-confirmation-modal').classList.remove('hidden');
@@ -2474,12 +3091,22 @@
         window.executeSavePackageToFirebase = async function() {
             if (!pendingPackagePayload) return;
             const pkg = pendingPackagePayload;
+            const idMatch = String(pkg.id || '').match(/^TRX-(\d{6})-(\d+)-/);
+            if (idMatch) {
+                try { localStorage.setItem(`kurir_bns_last_seq_${idMatch[1]}`, idMatch[2]); } catch (e) {}
+            }
             packages.unshift(pkg);
             window.closeSummaryModal();
             await syncPackageToFirebase(pkg);
             addAuditLog(`Petugas (${loggedUser.name}) menginput paket baru ${pkg.id} untuk ${pkg.recipient}`, loggedUser.name, 'PETUGAS');
             physicalPhotoDataUrl = null;
             document.getElementById('physical-photo-preview-wrap')?.classList.add('hidden');
+            const badge = document.getElementById('photo-status-badge');
+            if (badge) {
+                badge.className = "text-[8px] bg-amber-100/90 text-amber-800 px-2 py-0.5 rounded-full font-semibold inline-block border border-amber-200";
+                badge.innerText = "Belum Diambil";
+            }
+            window.clearFormDraft();
             document.getElementById('package-form')?.reset();
             window.renderPetugasForm();
             refreshActiveView();
@@ -2490,6 +3117,10 @@
             const q = (document.getElementById('filter-petugas-search')?.value || '').toLowerCase();
             const period = document.getElementById('filter-petugas-period')?.value || 'today';
             const slaFilter = document.getElementById('filter-petugas-sla')?.value || 'all';
+
+            const periodLabels = { today: 'Hari Ini', tomorrow: 'Terjadwal', yesterday: 'Kemarin', week: '1 Minggu', month: '1 Bulan', all: 'Semua Waktu' };
+            const activeBadge = document.getElementById('petugas-period-active-badge');
+            if (activeBadge) activeBadge.innerText = periodLabels[period] || 'Hari Ini';
 
             const filtered = packages.filter(p => {
                 const matchQ = !q || p.recipient?.toLowerCase().includes(q) || p.id?.toLowerCase().includes(q) || p.resi?.toLowerCase().includes(q) || p.destination?.toLowerCase().includes(q);
@@ -2506,29 +3137,73 @@
             document.getElementById('count-petugas-delivering-badge').innerText = delivList.length;
             document.getElementById('count-petugas-completed-badge').innerText = compList.length;
 
-            const cardHtml = (p) => `
-                <div class="p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-sm space-y-1 text-[9px]">
-                    <div class="flex justify-between items-center">
-                        <span class="font-mono font-bold text-indigo-700">${p.id}</span>
-                        ${window.getSlaBadgeHtml(p)}
+            const cardHtml = (p) => {
+                const safeId = String(p.id).replace(/'/g, "\\'");
+                const sourceDetail = p.source === 'external'
+                    ? `Eks: ${escapeHtml(p.vendor || '-')} (${escapeHtml(p.originLocation || '-')})`
+                    : `Int: ${escapeHtml(p.senderInternal || '-')} (${escapeHtml(p.roomSender || '-')})`;
+                return `
+                <div class="p-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-1.5 text-[9.5px] trx-info-card">
+                    <div class="flex flex-wrap justify-between items-start gap-1 border-b border-slate-100 pb-1.5">
+                        <div>
+                            <span class="font-mono font-extrabold text-indigo-700 block">${escapeHtml(p.id)}</span>
+                            <span class="font-mono text-[8.5px] text-slate-500 block">Resi: <strong>${escapeHtml(p.resi || '-')}</strong></span>
+                        </div>
+                        <div class="flex flex-col items-end gap-0.5">
+                            ${window.getSlaBadgeHtml(p)}
+                            <div class="flex items-center gap-1">
+                                ${window.getCodBadgeHtml(p)}
+                                <span class="px-1.5 py-0.2 rounded bg-purple-50 text-purple-700 font-bold uppercase text-[7.5px]">${escapeHtml(p.category || 'barang')}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="font-bold text-slate-800">${p.recipient} <span class="text-slate-500 font-normal">(${p.role})</span></div>
-                    <div class="text-rose-600 font-semibold"><i class="fa-solid fa-location-dot mr-1"></i>${p.destination}</div>
-                    <div class="text-[8px] text-slate-500 flex justify-between pt-1 border-t">
-                        <span>Kurir: <strong>${p.courier || '-'}</strong></span>
-                        <div class="space-x-1">
-                            <button type="button" onclick="window.openQrLabelModal('${p.id}')" class="text-indigo-600 font-bold" title="Cetak QR"><i class="fa-solid fa-qrcode"></i></button>
-                            <button type="button" onclick="window.sendWhatsAppNotification('${p.id}')" class="text-emerald-600 font-bold" title="Kirim WA"><i class="fa-brands fa-whatsapp"></i></button>
+
+                    <div class="space-y-0.5">
+                        <div class="font-extrabold text-slate-900 text-[10.5px] leading-snug break-words">
+                            <i class="fa-solid fa-user text-indigo-500 mr-1"></i>${escapeHtml(p.recipient)} <span class="text-slate-500 font-semibold text-[9px]">(${escapeHtml(p.role || '-')})</span>
+                        </div>
+                        <div class="text-rose-600 font-bold break-words">
+                            <i class="fa-solid fa-location-dot mr-1"></i>Tujuan: ${escapeHtml(p.destination || '-')}
+                        </div>
+                        <div class="text-slate-600 text-[8.5px] break-words flex items-center justify-between">
+                            <span><i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i>WA: <strong title="Nomor disensor demi privasi">${maskPhoneNumber(p.phone)}</strong></span>
+                            <span class="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono font-bold text-[8px]" title="PIN Verifikasi Serah Terima"><i class="fa-solid fa-key mr-0.5"></i>PIN: ${escapeHtml(getOrCreatePackagePin(p))}</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50/90 p-2 rounded-xl border border-slate-200/60 space-y-0.5 text-[8.5px] text-slate-600">
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Sumber:</span> <strong class="text-slate-700">${sourceDetail}</strong></div>
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Prioritas SLA:</span> <strong class="text-indigo-700">${escapeHtml(p.sla || '-')}</strong></div>
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Petugas Input:</span> <strong class="text-slate-700">${escapeHtml(p.petugas || '-')}</strong></div>
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Kurir Pengantar:</span> <strong class="text-sky-700">${escapeHtml(p.courier || 'Belum Ditugaskan')}</strong></div>
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Waktu Masuk:</span> <span>${escapeHtml(p.timestamp || '-')}</span></div>
+                        ${(p.status === 'completed' && p.completedTimestamp) ? `<div class="break-words text-emerald-700 font-semibold"><span class="text-emerald-600">Waktu Selesai:</span> ${escapeHtml(p.completedTimestamp)}</div>` : ''}
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Catatan:</span> <span class="text-slate-800 font-medium">${escapeHtml(p.notes || '-')}</span></div>
+                        ${(p.status === 'completed' && p.completionOption) ? `<div class="break-words text-emerald-700 font-bold pt-0.5 border-t border-slate-200/60"><i class="fa-solid fa-circle-check mr-1"></i>Ket. Terima: ${escapeHtml(p.completionOption)}</div>` : ''}
+                        ${p.exceptionStatus ? `<div class="break-words text-rose-600 font-bold pt-0.5 border-t border-rose-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Kendala: ${escapeHtml(p.exceptionStatus)}</div>` : ''}
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="flex items-center space-x-1.5">
+                            ${p.physicalPhotoUrl ? `<img src="${sanitizeImageUrl(p.physicalPhotoUrl)}" title="Foto Fisik Paket" class="w-7 h-7 object-cover rounded-lg border border-indigo-300 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                            ${p.proofPhotoUrl ? `<img src="${sanitizeImageUrl(p.proofPhotoUrl)}" title="Foto Bukti Serah Terima" class="w-7 h-7 object-cover rounded-lg border border-emerald-400 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                            ${p.signatureDataUrl ? `<img src="${sanitizeImageUrl(p.signatureDataUrl)}" title="Tanda Tangan Penerima" class="w-7 h-7 object-contain bg-white rounded-lg border border-slate-300 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button type="button" onclick="window.openInspectPackageModal('${safeId}')" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[8px]" title="Detail 360°"><i class="fa-solid fa-eye mr-0.5"></i>Detail</button>
+                            <button type="button" onclick="window.openQrLabelModal('${safeId}')" class="px-2 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-[8px]" title="Cetak QR"><i class="fa-solid fa-qrcode"></i></button>
+                            <button type="button" onclick="window.sendWhatsAppNotification('${safeId}')" class="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[8px]" title="Kirim WA"><i class="fa-brands fa-whatsapp"></i></button>
                         </div>
                     </div>
                 </div>
-            `;
+            `};
             document.getElementById('list-petugas-status-pending').innerHTML = pendingList.map(cardHtml).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Kosong</div>`;
             document.getElementById('list-petugas-status-delivering').innerHTML = delivList.map(cardHtml).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Kosong</div>`;
             document.getElementById('list-petugas-status-completed').innerHTML = compList.map(cardHtml).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Kosong</div>`;
         };
 
         window.switchCourierSubTab = function(sub) {
+            currentCourierSubTab = sub;
             ['pending', 'delivering', 'completed'].forEach(s => {
                 document.getElementById(`courier-panel-${s}`)?.classList.toggle('hidden', s !== sub);
                 const btn = document.getElementById(`courier-subtab-${s}`);
@@ -2563,15 +3238,20 @@
         function updateCourierBatchBar() {
             const bar = document.getElementById('courier-batch-bar');
             const countEl = document.getElementById('batch-selected-count');
+            const btnTake = document.getElementById('btn-batch-take');
+            const btnComplete = document.getElementById('btn-batch-complete');
             if (!bar || !countEl) return;
             countEl.innerText = `${selectedCourierPkgIds.size} Paket Dipilih`;
             bar.classList.toggle('hidden', selectedCourierPkgIds.size === 0);
+            if (btnTake) btnTake.classList.toggle('hidden', currentCourierSubTab !== 'pending');
+            if (btnComplete) btnComplete.classList.toggle('hidden', currentCourierSubTab !== 'delivering');
         }
 
         window.executeBatchTake = async function() {
             if (selectedCourierPkgIds.size === 0) return;
             const courierName = loggedUser.name || 'Kurir';
             let count = 0;
+            const takenIds = [];
             for (const id of selectedCourierPkgIds) {
                 const p = packages.find(item => String(item.id) === String(id));
                 if (p && p.status === 'pending') {
@@ -2580,7 +3260,11 @@
                     p.takenTimestampRaw = Date.now();
                     await syncPackageToFirebase(p);
                     count++;
+                    takenIds.push(p.id);
                 }
+            }
+            if (count > 0) {
+                addAuditLog(`Kurir (${courierName}) mengambil ${count} paket sekaligus (${takenIds.join(', ')})`, courierName, 'KURIR');
             }
             window.clearCourierSelection();
             refreshActiveView();
@@ -2594,6 +3278,10 @@
             proofPhotoDataUrl = null;
             document.getElementById('proof-thumb-container')?.classList.add('hidden');
             document.getElementById('complete-modal-title').innerText = `Serah Terima Sekaligus (${selectedCourierPkgIds.size} Paket)`;
+            const pinInput = document.getElementById('confirm-pin-input');
+            if (pinInput) pinInput.value = '';
+            const pinBadge = document.getElementById('confirm-pin-badge');
+            if (pinBadge) pinBadge.innerText = 'Opsional (Kurir Batch)';
             window.clearSignaturePad();
             document.getElementById('complete-modal').classList.remove('hidden');
         };
@@ -2611,55 +3299,111 @@
             document.getElementById('count-delivering-badge').innerText = deliv.length;
             document.getElementById('count-completed-badge').innerText = comp.length;
 
-            document.getElementById('list-courier-pending').innerHTML = pend.map(p => `
-                <div class="p-3 rounded-xl bg-slate-50 border flex flex-wrap justify-between items-center gap-2 text-[9.5px]">
-                    <div class="flex items-center space-x-2.5">
-                        <input type="checkbox" ${selectedCourierPkgIds.has(p.id) ? 'checked' : ''} onchange="window.toggleSelectCourierPkg('${p.id}')" class="w-4 h-4 rounded">
-                        <div>
-                            <div class="flex items-center space-x-1.5"><span class="font-mono font-bold text-indigo-700">${p.id}</span> ${window.getSlaBadgeHtml(p)}</div>
-                            <div class="font-extrabold text-slate-800">${p.recipient} (${p.role}) • <span class="text-rose-600">${p.destination}</span></div>
-                            <div class="text-[8.5px] text-slate-500">Resi: ${p.resi} • Catatan: ${p.notes || '-'}</div>
+            const buildCourierMetaHtml = (p) => {
+                const srcInfo = p.source === 'external'
+                    ? `Eksternal: ${escapeHtml(p.vendor || '-')} (${escapeHtml(p.originLocation || '-')})`
+                    : `Internal: ${escapeHtml(p.senderInternal || '-')} (${escapeHtml(p.roomSender || '-')})`;
+                return `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 bg-white/90 p-2.5 rounded-xl border border-slate-200/80 text-[8.5px] text-slate-600 mt-1.5">
+                        <div class="break-words"><span class="text-slate-400 font-semibold">No. Resi:</span> <strong class="font-mono text-slate-800">${escapeHtml(p.resi || '-')}</strong></div>
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Kategori & SLA:</span> <strong class="uppercase text-purple-700">${escapeHtml(p.category || '-')}</strong> • <strong class="text-indigo-700">${escapeHtml(p.sla || '-')}</strong></div>
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Sumber Paket:</span> <strong class="text-slate-800">${srcInfo}</strong></div>
+                        <div class="break-words"><span class="text-slate-400 font-semibold">WA (Privasi):</span> <strong class="text-emerald-700 font-mono">${maskPhoneNumber(p.phone)}</strong> • <span class="text-amber-700 font-mono font-bold">PIN: ${escapeHtml(getOrCreatePackagePin(p))}</span></div>
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Petugas Input:</span> <strong class="text-slate-800">${escapeHtml(p.petugas || '-')}</strong></div>
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Kurir Pengantar:</span> <strong class="text-sky-700">${escapeHtml(p.courier || 'Belum Ditugaskan')}</strong></div>
+                        <div class="break-words"><span class="text-slate-400 font-semibold">Waktu Masuk:</span> <span>${escapeHtml(p.timestamp || '-')}</span></div>
+                        ${(p.status === 'completed' && p.completedTimestamp) ? `<div class="break-words text-emerald-700 font-semibold"><span class="text-emerald-600">Waktu Selesai:</span> ${escapeHtml(p.completedTimestamp)}</div>` : ''}
+                        <div class="sm:col-span-2 break-words"><span class="text-slate-400 font-semibold">Catatan Paket:</span> <strong class="text-slate-800">${escapeHtml(p.notes || '-')}</strong></div>
+                        ${(p.status === 'completed' && p.completionOption) ? `<div class="sm:col-span-2 break-words text-emerald-700 font-bold border-t pt-1"><i class="fa-solid fa-circle-check mr-1"></i>Keterangan Selesai: ${escapeHtml(p.completionOption)}</div>` : ''}
+                        ${p.exceptionStatus ? `<div class="sm:col-span-2 break-words text-rose-600 font-bold border-t border-rose-200 pt-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Kendala: ${escapeHtml(p.exceptionStatus)}</div>` : ''}
+                    </div>
+                `;
+            };
+
+            document.getElementById('list-courier-pending').innerHTML = pend.map(p => {
+                const safeId = String(p.id).replace(/'/g, "\\'");
+                return `
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col gap-2 text-[9.5px] trx-info-card">
+                    <div class="flex flex-wrap justify-between items-start gap-2">
+                        <div class="flex items-start space-x-2.5 flex-1 min-w-[240px]">
+                            <input type="checkbox" ${selectedCourierPkgIds.has(p.id) ? 'checked' : ''} onchange="window.toggleSelectCourierPkg('${safeId}')" class="w-4 h-4 mt-0.5 rounded shrink-0">
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="font-mono font-extrabold text-indigo-700">${escapeHtml(p.id)}</span>
+                                    ${window.getSlaBadgeHtml(p)}
+                                    ${window.getCodBadgeHtml(p)}
+                                </div>
+                                <div class="font-extrabold text-slate-900 text-[10.5px] mt-0.5 break-words">${escapeHtml(p.recipient)} <span class="text-slate-500 font-semibold">(${escapeHtml(p.role)})</span> • <span class="text-rose-600"><i class="fa-solid fa-location-dot mr-0.5"></i>${escapeHtml(p.destination)}</span></div>
+                                ${buildCourierMetaHtml(p)}
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-1.5 shrink-0 self-end sm:self-center">
+                            ${p.physicalPhotoUrl ? `<img src="${sanitizeImageUrl(p.physicalPhotoUrl)}" title="Foto Fisik" class="w-9 h-9 object-cover rounded-xl border border-indigo-300 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                            <button type="button" onclick="window.sendWhatsAppNotification('${safeId}')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-2.5 py-1.5 rounded-xl text-[9px]" title="Hubungi WA"><i class="fa-brands fa-whatsapp"></i></button>
+                            <button type="button" onclick="window.takePackage('${safeId}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3.5 py-1.5 rounded-xl text-[9px] shadow">Ambil & Antar</button>
                         </div>
                     </div>
-                    <button type="button" onclick="window.takePackage('${p.id}')" class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-xl text-[9px] shadow">Ambil & Antar</button>
-                </div>
-            `).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Tidak ada antrian paket.</div>`;
+                </div>`;
+            }).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Tidak ada antrian paket.</div>`;
 
-            document.getElementById('list-courier-delivering').innerHTML = deliv.map(p => `
-                <div class="p-3 rounded-xl bg-slate-50 border flex flex-wrap justify-between items-center gap-2 text-[9.5px]">
-                    <div class="flex items-center space-x-2.5">
-                        <input type="checkbox" ${selectedCourierPkgIds.has(p.id) ? 'checked' : ''} onchange="window.toggleSelectCourierPkg('${p.id}')" class="w-4 h-4 rounded">
-                        <div>
-                            <div class="flex items-center space-x-1.5"><span class="font-mono font-bold text-sky-700">${p.id}</span> ${window.getSlaBadgeHtml(p)}</div>
-                            <div class="font-extrabold text-slate-800">${p.recipient} • <span class="text-rose-600">${p.destination}</span></div>
-                            <div class="text-[8.5px] text-slate-500">Kurir: <strong>${p.courier}</strong></div>
+            document.getElementById('list-courier-delivering').innerHTML = deliv.map(p => {
+                const safeId = String(p.id).replace(/'/g, "\\'");
+                return `
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col gap-2 text-[9.5px] trx-info-card">
+                    <div class="flex flex-wrap justify-between items-start gap-2">
+                        <div class="flex items-start space-x-2.5 flex-1 min-w-[240px]">
+                            <input type="checkbox" ${selectedCourierPkgIds.has(p.id) ? 'checked' : ''} onchange="window.toggleSelectCourierPkg('${safeId}')" class="w-4 h-4 mt-0.5 rounded shrink-0">
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="font-mono font-extrabold text-sky-700">${escapeHtml(p.id)}</span>
+                                    ${window.getSlaBadgeHtml(p)}
+                                    ${window.getCodBadgeHtml(p)}
+                                </div>
+                                <div class="font-extrabold text-slate-900 text-[10.5px] mt-0.5 break-words">${escapeHtml(p.recipient)} <span class="text-slate-500 font-semibold">(${escapeHtml(p.role)})</span> • <span class="text-rose-600"><i class="fa-solid fa-location-dot mr-0.5"></i>${escapeHtml(p.destination)}</span></div>
+                                ${buildCourierMetaHtml(p)}
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-1.5 shrink-0 self-end sm:self-center">
+                            ${p.physicalPhotoUrl ? `<img src="${sanitizeImageUrl(p.physicalPhotoUrl)}" title="Foto Fisik" class="w-9 h-9 object-cover rounded-xl border border-indigo-300 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                            <button type="button" onclick="window.sendWhatsAppNotification('${safeId}')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-2.5 py-1.5 rounded-xl text-[9px]" title="Hubungi WA"><i class="fa-brands fa-whatsapp"></i></button>
+                            <button type="button" onclick="window.openExceptionModal('${safeId}')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2.5 py-1.5 rounded-xl text-[8.5px]">Kendala / Titip Pos</button>
+                            <button type="button" onclick="window.openCompleteModal('${safeId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-1.5 rounded-xl text-[9px] shadow">Selesaikan</button>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-1.5">
-                        <button type="button" onclick="window.openExceptionModal('${p.id}')" class="bg-amber-100 text-amber-800 font-bold px-2.5 py-1.5 rounded-xl text-[8.5px]">Kendala / Titip Pos</button>
-                        <button type="button" onclick="window.openCompleteModal('${p.id}')" class="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-[9px] shadow">Selesaikan</button>
-                    </div>
-                </div>
-            `).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Tidak ada paket sedang dikirim.</div>`;
+                </div>`;
+            }).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Tidak ada paket sedang dikirim.</div>`;
 
-            document.getElementById('list-courier-completed').innerHTML = comp.map(p => `
-                <div class="p-3 rounded-xl bg-slate-50 border flex justify-between items-center text-[9.5px]">
-                    <div>
-                        <span class="font-mono font-bold text-emerald-700">${p.id}</span> • <strong>${p.recipient}</strong> (${p.destination})
-                        <div class="text-[8px] text-slate-500">Selesai: ${p.completedTimestamp || p.timestamp} • ${p.completionOption || ''}</div>
+            document.getElementById('list-courier-completed').innerHTML = comp.map(p => {
+                const safeId = String(p.id).replace(/'/g, "\\'");
+                return `
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-wrap justify-between items-start gap-2 text-[9.5px] trx-info-card">
+                    <div class="flex-1 min-w-[240px]">
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <span class="font-mono font-extrabold text-emerald-700">${escapeHtml(p.id)}</span>
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[8px]">Tuntas Diterima</span>
+                        </div>
+                        <div class="font-extrabold text-slate-900 text-[10.5px] mt-0.5 break-words">${escapeHtml(p.recipient)} <span class="text-slate-500 font-semibold">(${escapeHtml(p.role)})</span> • <span class="text-rose-600">${escapeHtml(p.destination)}</span></div>
+                        ${buildCourierMetaHtml(p)}
                     </div>
-                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[8px]">Tuntas</span>
+                    <div class="flex items-center space-x-1.5 shrink-0">
+                        ${p.physicalPhotoUrl ? `<img src="${sanitizeImageUrl(p.physicalPhotoUrl)}" title="Foto Fisik" class="w-8 h-8 object-cover rounded-lg border zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                        ${p.proofPhotoUrl ? `<img src="${sanitizeImageUrl(p.proofPhotoUrl)}" title="Foto Bukti" class="w-8 h-8 object-cover rounded-lg border border-emerald-400 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                        ${p.signatureDataUrl ? `<img src="${sanitizeImageUrl(p.signatureDataUrl)}" title="TTD Penerima" class="w-8 h-8 object-contain bg-white rounded-lg border zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                        <button type="button" onclick="window.openInspectPackageModal('${safeId}')" class="px-2.5 py-1.5 rounded-xl bg-white border text-slate-700 font-bold text-[8.5px]"><i class="fa-solid fa-eye mr-1"></i>Detail</button>
+                    </div>
                 </div>
-            `).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Belum ada riwayat selesai.</div>`;
+            `}).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Belum ada riwayat selesai.</div>`;
         };
 
         window.takePackage = async function(id) {
             const p = packages.find(item => String(item.id) === String(id));
             if (!p) return;
+            const courierName = loggedUser.name || 'Kurir';
             p.status = 'delivering';
-            p.courier = loggedUser.name || 'Kurir';
+            p.courier = courierName;
             p.takenTimestampRaw = Date.now();
             await syncPackageToFirebase(p);
+            addAuditLog(`Kurir (${courierName}) mengambil paket ${p.id} tujuan ${p.destination}`, courierName, 'KURIR');
             refreshActiveView();
             showToast(`Paket ${id} diambil untuk diantar!`);
         };
@@ -2682,6 +3426,7 @@
             p.notes = note ? `${p.notes || ''} [Kendala: ${reason} - ${note}]` : `${p.notes || ''} [Kendala: ${reason}]`;
             p.status = 'pending';
             await syncPackageToFirebase(p);
+            addAuditLog(`Kurir (${loggedUser.name || 'Kurir'}) melaporkan kendala paket ${p.id}: ${reason}`, loggedUser.name || 'Kurir', 'KURIR');
             window.closeExceptionModal();
             refreshActiveView();
             showToast('Status kendala / titip pos berhasil dicatat!');
@@ -2695,6 +3440,23 @@
             document.getElementById('confirm-receiver-name').value = p ? p.recipient : '';
             document.getElementById('proof-thumb-container')?.classList.add('hidden');
             document.getElementById('complete-modal-title').innerText = `Selesaikan Pengiriman (${id})`;
+            const pinInput = document.getElementById('confirm-pin-input');
+            const pinBadge = document.getElementById('confirm-pin-badge');
+            const pinHint = document.getElementById('confirm-pin-hint');
+            if (pinInput) pinInput.value = '';
+            if (currentRole === 'penerima' && !loggedUser.isSuperAdmin) {
+                if (pinBadge) {
+                    pinBadge.className = 'text-[7.5px] px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 font-extrabold';
+                    pinBadge.innerText = 'Wajib Diisi';
+                }
+                if (pinHint) pinHint.innerText = 'Demi keamanan, ketik 4 digit PIN Paket (dari WA/Stiker QR) atau 4 angka terakhir No. WhatsApp Anda.';
+            } else {
+                if (pinBadge) {
+                    pinBadge.className = 'text-[7.5px] px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold';
+                    pinBadge.innerText = p ? `PIN Paket: ${getOrCreatePackagePin(p)}` : 'Opsional (Kurir)';
+                }
+                if (pinHint) pinHint.innerText = 'Kurir dapat memasukkan PIN dari penerima atau langsung konfirmasi dengan foto bukti / TTD.';
+            }
             window.clearSignaturePad();
             document.getElementById('complete-modal').classList.remove('hidden');
         };
@@ -2704,11 +3466,39 @@
         window.submitCompleteDelivery = async function() {
             const recName = document.getElementById('confirm-receiver-name').value.trim() || 'Penerima';
             const opt = document.getElementById('confirm-completion-option').value;
+            const enteredPin = (document.getElementById('confirm-pin-input')?.value || '').trim();
             const sigUrl = hasSignatureStroke && sigCanvas ? sigCanvas.toDataURL('image/png') : null;
             const nowMs = Date.now();
             const doneTime = formatTimestampIndo(nowMs);
+            const actorRole = currentRole === 'penerima' ? 'PENERIMA' : 'KURIR';
+            const actorName = loggedUser.name || recName;
+
+            if (!isBatchCompleting && activeCompletingId) {
+                const pCheck = packages.find(item => String(item.id) === String(activeCompletingId));
+                if (pCheck) {
+                    const expectedPin = getOrCreatePackagePin(pCheck);
+                    const phoneDigits = String(pCheck.phone || '').replace(/\D/g, '');
+                    const last4Wa = phoneDigits.length >= 4 ? phoneDigits.slice(-4) : '';
+                    const isPinMatch = enteredPin && (enteredPin === expectedPin || (last4Wa && enteredPin === last4Wa));
+
+                    if (currentRole === 'penerima' && !loggedUser.isSuperAdmin) {
+                        if (!enteredPin) {
+                            showToast('Wajib memasukkan 4 digit PIN Paket atau 4 digit akhir No. WA Anda!', 'error');
+                            return;
+                        }
+                        if (!isPinMatch) {
+                            showToast('PIN Verifikasi tidak sesuai! Cek kembali PIN pada WA/Stiker atau 4 angka akhir No. WA Anda.', 'error');
+                            return;
+                        }
+                    } else if (enteredPin && !isPinMatch) {
+                        showToast('PIN yang dimasukkan tidak cocok dengan PIN Paket maupun 4 digit akhir WA!', 'error');
+                        return;
+                    }
+                }
+            }
 
             if (isBatchCompleting) {
+                const completedIds = [];
                 for (const id of selectedCourierPkgIds) {
                     const p = packages.find(item => String(item.id) === String(id));
                     if (p) {
@@ -2719,19 +3509,25 @@
                         if (proofPhotoDataUrl) p.proofPhotoUrl = proofPhotoDataUrl;
                         if (sigUrl) p.signatureDataUrl = sigUrl;
                         await syncPackageToFirebase(p);
+                        completedIds.push(p.id);
                     }
+                }
+                if (completedIds.length > 0) {
+                    addAuditLog(`${actorRole} (${actorName}) menyelesaikan ${completedIds.length} paket sekaligus (${completedIds.join(', ')}) — Diterima oleh: ${recName}`, actorName, actorRole);
                 }
                 window.clearCourierSelection();
             } else if (activeCompletingId) {
                 const p = packages.find(item => String(item.id) === String(activeCompletingId));
                 if (p) {
+                    const verifiedTag = enteredPin ? ' [PIN Terverifikasi]' : '';
                     p.status = 'completed';
                     p.completedTimestamp = doneTime;
                     p.completedTimestampRaw = nowMs;
-                    p.completionOption = `${opt} (${recName})`;
+                    p.completionOption = `${opt} (${recName})${verifiedTag}`;
                     if (proofPhotoDataUrl) p.proofPhotoUrl = proofPhotoDataUrl;
                     if (sigUrl) p.signatureDataUrl = sigUrl;
                     await syncPackageToFirebase(p);
+                    addAuditLog(`${actorRole} (${actorName}) menyelesaikan serah terima paket ${p.id} (${opt} - ${recName})${verifiedTag}`, actorName, actorRole);
                 }
             }
             window.closeCompleteModal();
@@ -2740,24 +3536,58 @@
         };
 
         window.renderReceiverView = function() {
-            const q = (document.getElementById('receiver-session-name')?.value || '').toLowerCase();
+            const inputEl = document.getElementById('receiver-session-name');
+            const q = (inputEl?.value || '').trim().toLowerCase();
             const st = document.getElementById('filter-receiver-status')?.value || 'all';
+            const container = document.getElementById('receiver-packages-list');
+            if (!container) return;
+
+            if (!q && !loggedUser.isSuperAdmin) {
+                container.innerHTML = `<div class="text-center py-6 text-slate-500 text-[9.5px]"><i class="fa-solid fa-magnifying-glass mr-1 text-emerald-600"></i>Silakan ketik <strong>Nama Anda</strong> atau <strong>Ruangan</strong> pada kolom di atas untuk melihat paket milik Anda.</div>`;
+                return;
+            }
+
             const list = packages.filter(p => {
                 const matchName = !q || p.recipient?.toLowerCase().includes(q) || p.destination?.toLowerCase().includes(q);
                 const matchSt = st === 'all' || (st === 'completed' ? p.status === 'completed' : p.status !== 'completed');
                 return matchName && matchSt;
             });
-            const container = document.getElementById('receiver-packages-list');
-            if (!container) return;
-            container.innerHTML = list.map(p => `
-                <div class="p-3 rounded-xl bg-slate-50 border flex flex-wrap justify-between items-center gap-2 text-[9.5px]">
-                    <div>
-                        <span class="font-mono font-bold text-indigo-700">${p.id}</span> • <strong>${p.recipient}</strong> (${p.destination})
-                        <div class="text-[8.5px] text-slate-500">Status: <strong>${p.status.toUpperCase()}</strong> • Kurir: ${p.courier || '-'}</div>
+            container.innerHTML = list.map(p => {
+                const safeId = String(p.id).replace(/'/g, "\\'");
+                const srcInfo = p.source === 'external'
+                    ? `Eksternal: ${escapeHtml(p.vendor || '-')} (${escapeHtml(p.originLocation || '-')})`
+                    : `Internal: ${escapeHtml(p.senderInternal || '-')} (${escapeHtml(p.roomSender || '-')})`;
+                return `
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-wrap justify-between items-start gap-3 text-[9.5px] trx-info-card">
+                    <div class="flex-1 min-w-[240px] space-y-1">
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <span class="font-mono font-extrabold text-indigo-700">${escapeHtml(p.id)}</span>
+                            <span class="font-mono text-[8.5px] text-slate-500">Resi: <strong>${escapeHtml(p.resi || '-')}</strong></span>
+                            <span class="px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase ${p.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : (p.status === 'delivering' ? 'bg-sky-100 text-sky-700' : 'bg-amber-100 text-amber-800')}">${escapeHtml(p.status.toUpperCase())}</span>
+                            ${window.getSlaBadgeHtml(p)}
+                        </div>
+                        <div class="font-extrabold text-slate-900 text-[10.5px] break-words">
+                            ${escapeHtml(p.recipient)} <span class="text-slate-500 font-semibold">(${escapeHtml(p.role || '-')})</span> • <span class="text-rose-600"><i class="fa-solid fa-location-dot mr-0.5"></i>${escapeHtml(p.destination)}</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 bg-white p-2.5 rounded-xl border border-slate-200/70 text-[8.5px] text-slate-600">
+                            <div class="break-words"><span class="text-slate-400 font-semibold">Sumber / Pengirim:</span> <strong class="text-slate-800">${srcInfo}</strong></div>
+                            <div class="break-words"><span class="text-slate-400 font-semibold">Kategori & SLA:</span> <strong class="uppercase text-purple-700">${escapeHtml(p.category || '-')}</strong> • <strong>${escapeHtml(p.sla || '-')}</strong></div>
+                            <div class="break-words"><span class="text-slate-400 font-semibold">Petugas Pos:</span> <strong class="text-slate-800">${escapeHtml(p.petugas || '-')}</strong></div>
+                            <div class="break-words"><span class="text-slate-400 font-semibold">Kurir Pengantar:</span> <strong class="text-sky-700">${escapeHtml(p.courier || 'Menunggu Kurir')}</strong></div>
+                            <div class="break-words"><span class="text-slate-400 font-semibold">Waktu Masuk:</span> <span>${escapeHtml(p.timestamp || '-')}</span></div>
+                            ${(p.status === 'completed' && p.completedTimestamp) ? `<div class="break-words text-emerald-700 font-semibold"><span class="text-emerald-600">Waktu Diterima:</span> ${escapeHtml(p.completedTimestamp)}</div>` : ''}
+                            <div class="sm:col-span-2 break-words"><span class="text-slate-400 font-semibold">Catatan Paket:</span> <strong class="text-slate-800">${escapeHtml(p.notes || '-')}</strong></div>
+                            ${(p.status === 'completed' && p.completionOption) ? `<div class="sm:col-span-2 break-words text-emerald-700 font-bold border-t pt-1"><i class="fa-solid fa-circle-check mr-1"></i>Keterangan Terima: ${escapeHtml(p.completionOption)}</div>` : ''}
+                        </div>
                     </div>
-                    ${p.status !== 'completed' ? `<button type="button" onclick="window.openCompleteModal('${p.id}')" class="bg-emerald-600 text-white font-bold px-3 py-1 rounded-xl text-[9px]">Konfirmasi Terima</button>` : `<span class="text-emerald-700 font-bold text-[8.5px]">Sudah Diterima</span>`}
-                </div>
-            `).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Tidak ada paket ditemukan.</div>`;
+                    <div class="flex flex-wrap items-center gap-1.5 shrink-0 self-end sm:self-center">
+                        ${p.physicalPhotoUrl ? `<img src="${sanitizeImageUrl(p.physicalPhotoUrl)}" title="Foto Paket Fisik" class="w-9 h-9 object-cover rounded-xl border border-indigo-300 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                        ${p.proofPhotoUrl ? `<img src="${sanitizeImageUrl(p.proofPhotoUrl)}" title="Foto Bukti Terima" class="w-9 h-9 object-cover rounded-xl border border-emerald-400 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                        ${p.signatureDataUrl ? `<img src="${sanitizeImageUrl(p.signatureDataUrl)}" title="TTD Penerima" class="w-9 h-9 object-contain bg-white rounded-xl border zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                        ${p.status !== 'completed' ? `<button type="button" onclick="window.openCompleteModal('${safeId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-1.5 rounded-xl text-[9px] shadow">Konfirmasi Terima</button>` : `<span class="px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-700 font-bold text-[8.5px]"><i class="fa-solid fa-check-double mr-1"></i>Sudah Diterima</span>`}
+                    </div>
+                </div>`;
+            }).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Tidak ada paket ditemukan untuk "${escapeHtml(q)}".</div>`;
         };
 
         window.switchAdminTab = function(tab) {
@@ -2777,7 +3607,6 @@
             if (tab === 'audit') window.renderAuditLogs();
         };
 
-        // --- SUPER ADMIN OVERVIEW: RADAR SLA, WORKLOAD KURIR & GRAFIK CHART.JS ---
         function renderAdminOverview() {
             const total = packages.length;
             const deliv = packages.filter(p => p.status === 'delivering').length;
@@ -2788,7 +3617,6 @@
             document.getElementById('stat-comp-pkg').innerText = comp;
             document.getElementById('stat-success-rate').innerText = `${rate}%`;
 
-            // 1. Radar Paket Lewat SLA / Menginap
             const overdueList = packages.filter(p => p.status !== 'completed' && (getPackageSlaRemainMinutes(p) < 0 || p.exceptionStatus));
             const overdueBadge = document.getElementById('overdue-watchlist-badge');
             if (overdueBadge) overdueBadge.innerText = `${overdueList.length} Paket Kritis`;
@@ -2802,9 +3630,9 @@
                         return `
                         <div class="p-2 rounded-xl bg-rose-50/90 border border-rose-200 flex justify-between items-center gap-2 text-[9px]">
                             <div>
-                                <div class="flex items-center space-x-1.5"><span class="font-mono font-bold text-rose-700">${p.id}</span> ${window.getSlaBadgeHtml(p)}</div>
-                                <div class="font-bold text-slate-800">${p.recipient} • <span class="text-rose-600">${p.destination}</span></div>
-                                <div class="text-[8px] text-slate-500">Kurir: <strong>${p.courier || 'Belum Diambil'}</strong></div>
+                                <div class="flex items-center space-x-1.5"><span class="font-mono font-bold text-rose-700">${escapeHtml(p.id)}</span> ${window.getSlaBadgeHtml(p)}</div>
+                                <div class="font-bold text-slate-800">${escapeHtml(p.recipient)} • <span class="text-rose-600">${escapeHtml(p.destination)}</span></div>
+                                <div class="text-[8px] text-slate-500">Kurir: <strong>${escapeHtml(p.courier || 'Belum Diambil')}</strong></div>
                             </div>
                             <div class="flex items-center space-x-1 shrink-0">
                                 <button type="button" onclick="window.openAdminEditPackageModal('${safeId}')" class="px-2 py-1 rounded-lg bg-indigo-600 text-white font-bold text-[8px]">Alihkan</button>
@@ -2815,7 +3643,6 @@
                 }
             }
 
-            // 2. Monitor Beban Kerja Kurir Realtime
             const workloadContainer = document.getElementById('admin-courier-workload-list');
             if (workloadContainer) {
                 const courierMembers = members.filter(m => m.role === 'kurir');
@@ -2834,7 +3661,7 @@
                             <div class="flex items-center space-x-2">
                                 <div class="w-6 h-6 rounded-lg ${carrying > 0 ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-600'} flex items-center justify-center font-bold text-[8px]"><i class="fa-solid fa-motorcycle"></i></div>
                                 <div>
-                                    <div class="font-extrabold text-slate-800">${cName}</div>
+                                    <div class="font-extrabold text-slate-800">${escapeHtml(cName)}</div>
                                     <div class="text-[8px] text-slate-500">Total Selesai: ${totalDone} paket</div>
                                 </div>
                             </div>
@@ -2847,7 +3674,6 @@
                 }
             }
 
-            // 3. Render 4 Grafik Chart.js
             renderAdminCharts();
         }
 
@@ -2887,13 +3713,12 @@
                 }
             };
 
-            createOrUpdate('source', 'chartSource', 'doughnut', ['Eksternal', 'Internal'], [extCount || 1, intCount], ['#4f46e5', '#0ea5e9']);
-            createOrUpdate('category', 'chartCategory', 'pie', ['Dokumen', 'Makanan', 'Barang'], [catMap.dokumen, catMap.makanan, catMap.barang || 1], ['#8b5cf6', '#f59e0b', '#10b981']);
-            createOrUpdate('role', 'chartRole', 'doughnut', ['Guru', 'Staf', 'Siswa'], [roleMap.Teacher || 1, roleMap.Staff, roleMap.Student], ['#ec4899', '#06b6d4', '#6366f1']);
-            createOrUpdate('dest', 'chartExpedition', 'bar', topDests.length ? topDests.map(x => x[0]) : ['Ruang Guru'], topDests.length ? topDests.map(x => x[1]) : [0], ['#4f46e5', '#7c3aed', '#0ea5e9', '#10b981', '#f59e0b']);
+            createOrUpdate('source', 'chartSource', 'doughnut', ['Eksternal', 'Internal'], [extCount, intCount], ['#4f46e5', '#0ea5e9']);
+            createOrUpdate('category', 'chartCategory', 'pie', ['Dokumen', 'Makanan', 'Barang'], [catMap.dokumen || 0, catMap.makanan || 0, catMap.barang || 0], ['#8b5cf6', '#f59e0b', '#10b981']);
+            createOrUpdate('role', 'chartRole', 'doughnut', ['Guru', 'Staf', 'Siswa'], [roleMap.Teacher || 0, roleMap.Staff || 0, roleMap.Student || 0], ['#ec4899', '#06b6d4', '#6366f1']);
+            createOrUpdate('dest', 'chartExpedition', 'bar', topDests.length ? topDests.map(x => x[0]) : ['Belum Ada Data'], topDests.length ? topDests.map(x => x[1]) : [0], ['#4f46e5', '#7c3aed', '#0ea5e9', '#10b981', '#f59e0b']);
         }
 
-        // --- MODAL 360° PACKAGE INSPECTOR & EDIT ADMIN ---
         window.openInspectPackageModal = function(pkgId) {
             const p = packages.find(item => String(item.id) === String(pkgId));
             if (!p) return;
@@ -2912,39 +3737,46 @@
                 <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-2xl border text-center">
                     <div>
                         <span class="text-[8px] text-slate-400 uppercase font-bold block">1. Diinput Petugas</span>
-                        <strong class="text-indigo-700 block">${p.petugas || '-'}</strong>
-                        <span class="text-[8px] text-slate-500">${p.timestamp || '-'}</span>
+                        <strong class="text-indigo-700 block">${escapeHtml(p.petugas || '-')}</strong>
+                        <span class="text-[8px] text-slate-500">${escapeHtml(p.timestamp || '-')}</span>
                     </div>
                     <div class="border-x px-1">
                         <span class="text-[8px] text-slate-400 uppercase font-bold block">2. Kurir Pengantar</span>
-                        <strong class="text-sky-700 block">${p.courier || 'Belum Ditugaskan'}</strong>
-                        <span class="text-[8px] text-slate-500">SLA: ${p.sla || '-'}</span>
+                        <strong class="text-sky-700 block">${escapeHtml(p.courier || 'Belum Ditugaskan')}</strong>
+                        <span class="text-[8px] text-slate-500">SLA: ${escapeHtml(p.sla || '-')}</span>
                     </div>
                     <div>
                         <span class="text-[8px] text-slate-400 uppercase font-bold block">3. Diterima Tujuan</span>
-                        <strong class="text-emerald-700 block">${p.status === 'completed' ? 'TUNTAS' : p.status.toUpperCase()}</strong>
-                        <span class="text-[8px] text-slate-500">${p.completedTimestamp || durationText}</span>
+                        <strong class="text-emerald-700 block">${p.status === 'completed' ? 'TUNTAS' : escapeHtml(p.status.toUpperCase())}</strong>
+                        <span class="text-[8px] text-slate-500">${escapeHtml(p.completedTimestamp || durationText)}</span>
                     </div>
                 </div>
                 <div class="bg-slate-50 p-2.5 rounded-2xl border space-y-1">
-                    <div class="flex justify-between"><span>No. Resi / Sumber:</span><strong>${p.resi || '-'} (${(p.source || 'external').toUpperCase()})</strong></div>
-                    <div class="flex justify-between"><span>Pengirim / Vendor:</span><strong>${p.source === 'external' ? (p.vendor + ' - ' + p.originLocation) : (p.senderInternal + ' - ' + p.roomSender)}</strong></div>
-                    <div class="flex justify-between"><span>No. WhatsApp Penerima:</span><strong>${p.phone || '-'}</strong></div>
-                    <div class="flex justify-between"><span>Durasi Penyelesaian:</span><strong class="text-indigo-600">${durationText}</strong></div>
-                    <div class="flex justify-between"><span>Keterangan / Catatan:</span><strong>${p.completionOption || p.notes || '-'}</strong></div>
+                    <div class="flex justify-between"><span>No. Resi / Sumber:</span><strong>${escapeHtml(p.resi || '-')} (${escapeHtml((p.source || 'external').toUpperCase())})</strong></div>
+                    <div class="flex justify-between"><span>Pengirim / Vendor:</span><strong>${escapeHtml(p.source === 'external' ? (p.vendor + ' - ' + p.originLocation) : (p.senderInternal + ' - ' + p.roomSender))}</strong></div>
+                    <div class="flex justify-between items-center">
+                        <span>No. WhatsApp Penerima:</span>
+                        <span class="flex items-center space-x-1.5">
+                            <strong id="inspect-phone-val" class="font-mono text-emerald-700">${maskPhoneNumber(p.phone)}</strong>
+                            ${currentRole === 'admin' && p.phone && p.phone !== '-' ? `<button type="button" onclick="const el=document.getElementById('inspect-phone-val'); el.innerText = el.innerText.includes('•') ? '${escapeHtml(p.phone)}' : '${maskPhoneNumber(p.phone)}';" class="text-[8px] px-1.5 py-0.2 rounded bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold" title="Tampilkan / Sensor Nomor"><i class="fa-solid fa-eye"></i></button>` : ''}
+                        </span>
+                    </div>
+                    <div class="flex justify-between"><span>PIN Verifikasi Terima:</span><strong class="font-mono text-amber-700 bg-amber-50 px-2 rounded border border-amber-200">${escapeHtml(getOrCreatePackagePin(p))}</strong></div>
+                    <div class="flex justify-between"><span>Durasi Penyelesaian:</span><strong class="text-indigo-600">${escapeHtml(durationText)}</strong></div>
+                    <div class="flex justify-between"><span>Keterangan / Catatan:</span><strong>${escapeHtml((p.status === 'completed' && p.completionOption) ? p.completionOption : (p.notes || '-'))}</strong></div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 text-center">
                     <div class="p-2 rounded-xl border bg-slate-50">
                         <span class="text-[8px] font-bold text-slate-500 block mb-1">Foto Fisik Awal</span>
-                        ${p.physicalPhotoUrl ? `<img src="${p.physicalPhotoUrl}" class="w-full h-24 object-cover rounded-lg mx-auto zoomable-img" onclick="window.openZoomModal(this.src)">` : `<div class="h-24 flex items-center justify-center text-slate-400 text-[8px]">Tidak ada foto</div>`}
+                        ${p.physicalPhotoUrl ? `<img src="${sanitizeImageUrl(p.physicalPhotoUrl)}" class="w-full h-24 object-cover rounded-lg mx-auto zoomable-img" onclick="window.openZoomModal(this.src)">` : `<div class="h-24 flex items-center justify-center text-slate-400 text-[8px]">Tidak ada foto</div>`}
                     </div>
                     <div class="p-2 rounded-xl border bg-slate-50">
                         <span class="text-[8px] font-bold text-slate-500 block mb-1">Foto Bukti Kurir</span>
-                        ${p.proofPhotoUrl ? `<img src="${p.proofPhotoUrl}" class="w-full h-24 object-cover rounded-lg mx-auto zoomable-img" onclick="window.openZoomModal(this.src)">` : `<div class="h-24 flex items-center justify-center text-slate-400 text-[8px]">Belum ada foto</div>`}
+                        ${p.proofPhotoUrl ? `<img src="${sanitizeImageUrl(p.proofPhotoUrl)}" class="w-full h-24 object-cover rounded-lg mx-auto zoomable-img" onclick="window.openZoomModal(this.src)">` : `<div class="h-24 flex items-center justify-center text-slate-400 text-[8px]">Belum ada foto</div>`}
                     </div>
                     <div class="p-2 rounded-xl border bg-white">
                         <span class="text-[8px] font-bold text-slate-500 block mb-1">Tanda Tangan</span>
-                        ${p.signatureDataUrl ? `<img src="${p.signatureDataUrl}" class="w-full h-24 object-contain rounded-lg mx-auto border zoomable-img" onclick="window.openZoomModal(this.src)">` : `<div class="h-24 flex items-center justify-center text-slate-400 text-[8px]">Belum ada TTD</div>`}
+                        ${p.signatureDataUrl ? `<img src="${sanitizeImageUrl(p.signatureDataUrl)}" class="w-full h-24 object-contain rounded-lg mx-auto border zoomable-img" onclick="window.openZoomModal(this.src)">` : `<div class="h-24 flex items-center justify-center text-slate-400 text-[8px]">Belum ada TTD</div>`}
                     </div>
                 </div>
             `;
@@ -2953,6 +3785,28 @@
 
         window.closeInspectPackageModal = function() {
             document.getElementById('admin-inspect-modal').classList.add('hidden');
+        };
+
+        window.handleAdminEditStatusChange = function(newStatus) {
+            const compWrap = document.getElementById('edit-pkg-completion-wrap');
+            const resetWrap = document.getElementById('edit-pkg-reset-proof-wrap');
+            const courierEl = document.getElementById('edit-pkg-courier');
+            if (compWrap) compWrap.classList.toggle('hidden', newStatus !== 'completed');
+            if (resetWrap) resetWrap.classList.toggle('hidden', newStatus === 'completed');
+            if (newStatus === 'pending' && courierEl && courierEl.value !== 'Belum Ditugaskan') {
+                // Jika dikembalikan ke Pending (Antrian Pos), default kurir kembali ke Belum Ditugaskan
+                courierEl.value = 'Belum Ditugaskan';
+            }
+        };
+
+        window.handleAdminEditCourierChange = function(newCourier) {
+            const statusEl = document.getElementById('edit-pkg-status');
+            if (!statusEl) return;
+            // Jika status masih pending lalu Admin memilih kurir tertentu, otomatis ubah ke delivering
+            if (newCourier && newCourier !== 'Belum Ditugaskan' && statusEl.value === 'pending') {
+                statusEl.value = 'delivering';
+                window.handleAdminEditStatusChange('delivering');
+            }
         };
 
         window.openAdminEditPackageModal = function(pkgId) {
@@ -2965,9 +3819,15 @@
             document.getElementById('edit-pkg-destination').value = p.destination || '';
             document.getElementById('edit-pkg-phone').value = p.phone || '';
             document.getElementById('edit-pkg-courier').value = p.courier || 'Belum Ditugaskan';
-            document.getElementById('edit-pkg-status').value = p.status || 'pending';
+            const currentSt = p.status || 'pending';
+            document.getElementById('edit-pkg-status').value = currentSt;
             document.getElementById('edit-pkg-sla').value = p.sla || '2 jam (reguler)';
             document.getElementById('edit-pkg-notes').value = p.notes || '';
+            const compInput = document.getElementById('edit-pkg-completion-option');
+            if (compInput) compInput.value = p.completionOption || `Diterima langsung oleh ${p.recipient || 'Penerima'}`;
+            const clearProofChk = document.getElementById('edit-pkg-clear-proof');
+            if (clearProofChk) clearProofChk.checked = true;
+            window.handleAdminEditStatusChange(currentSt);
             document.getElementById('admin-edit-pkg-modal').classList.remove('hidden');
         };
 
@@ -2980,6 +3840,7 @@
             const id = document.getElementById('edit-pkg-id').value;
             const p = packages.find(item => String(item.id) === String(id));
             if (!p) return;
+            const prevStatus = p.status;
             p.recipient = document.getElementById('edit-pkg-recipient').value.trim();
             p.role = document.getElementById('edit-pkg-role').value;
             p.destination = document.getElementById('edit-pkg-destination').value.trim();
@@ -2987,19 +3848,43 @@
             p.courier = document.getElementById('edit-pkg-courier').value;
             p.status = document.getElementById('edit-pkg-status').value;
             p.sla = document.getElementById('edit-pkg-sla').value;
-            p.notes = document.getElementById('edit-pkg-notes').value.trim();
-            if (p.status === 'completed' && !p.completedTimestamp) {
-                p.completedTimestamp = formatTimestampIndo(Date.now());
-                p.completedTimestampRaw = Date.now();
+            p.notes = document.getElementById('edit-pkg-notes').value.trim() || '-';
+
+            if (p.status === 'completed') {
+                if (!p.completedTimestamp) {
+                    p.completedTimestamp = formatTimestampIndo(Date.now());
+                    p.completedTimestampRaw = Date.now();
+                }
+                const compText = document.getElementById('edit-pkg-completion-option')?.value.trim();
+                p.completionOption = compText || p.completionOption || `Diselesaikan oleh Admin (${loggedUser.name || 'Admin'})`;
+                p.exceptionStatus = '';
+            } else {
+                // Status diubah ke 'pending' atau 'delivering' -> wajib bersihkan atribut selesai agar tidak tampil seperti sudah diterima
+                p.completedTimestamp = '';
+                p.completedTimestampRaw = null;
+                p.completionOption = '';
+                const shouldClearProof = document.getElementById('edit-pkg-clear-proof')?.checked ?? true;
+                if (shouldClearProof) {
+                    p.proofPhotoUrl = null;
+                    p.signatureDataUrl = null;
+                }
+                if (p.status === 'pending') {
+                    p.takenTimestampRaw = null;
+                } else if (p.status === 'delivering') {
+                    p.exceptionStatus = '';
+                    if (!p.takenTimestampRaw) p.takenTimestampRaw = Date.now();
+                    // Bersihkan tag [Kendala: ...] lama pada catatan jika status diubah ke sedang diantar kembali
+                    p.notes = String(p.notes || '').replace(/\s*\[Kendala:.*?\]/g, '').trim() || '-';
+                }
             }
+
             await syncPackageToFirebase(p);
-            addAuditLog(`Admin (${loggedUser.name}) mengedit/mengalihkan paket ${p.id} (Kurir: ${p.courier}, Status: ${p.status})`, loggedUser.name, 'ADMIN');
+            addAuditLog(`Admin (${loggedUser.name}) mengedit paket ${p.id}: Status ${prevStatus.toUpperCase()} -> ${p.status.toUpperCase()}, Kurir: ${p.courier}`, loggedUser.name, 'ADMIN');
             window.closeAdminEditPackageModal();
             refreshActiveView();
-            showToast(`Data paket ${p.id} berhasil diperbarui Admin!`);
+            showToast(`Data & status paket ${p.id} berhasil diperbarui!`);
         };
 
-        // --- MANAJEMEN & HAPUS TRANSAKSI ADMIN (DENGAN FITUR PILIH BANYAK / BULK DELETE) ---
         function updateAdminPkgBatchBar() {
             const bar = document.getElementById('admin-pkg-batch-bar');
             const countEl = document.getElementById('admin-batch-selected-count');
@@ -3065,30 +3950,46 @@
             tbody.innerHTML = list.map(p => {
                 const safeId = String(p.id).replace(/'/g, "\\'");
                 const isChecked = selectedAdminPkgIds.has(String(p.id)) ? 'checked' : '';
+                const srcDetail = p.source === 'external'
+                    ? `${escapeHtml(p.vendor || '-')} (${escapeHtml(p.originLocation || '-')})`
+                    : `${escapeHtml(p.senderInternal || '-')} (${escapeHtml(p.roomSender || '-')})`;
                 return `
-                <tr class="hover:bg-slate-50 transition">
+                <tr class="hover:bg-slate-50 transition align-top trx-info-card">
                     <td class="p-2 text-center">
                         <input type="checkbox" ${isChecked} onchange="window.toggleSelectAdminPkg('${safeId}')" class="w-4 h-4 rounded cursor-pointer accent-rose-600">
                     </td>
-                    <td class="p-2">
-                        <div class="font-mono font-bold text-indigo-700">${p.id}</div>
-                        <div class="text-[8px] text-slate-400">${p.timestamp || '-'}</div>
+                    <td class="p-2 min-w-[140px]">
+                        <div class="font-mono font-bold text-indigo-700 break-words">${escapeHtml(p.id)}</div>
+                        <div class="font-mono text-[8.5px] text-slate-600 break-words">Resi: <strong>${escapeHtml(p.resi || '-')}</strong></div>
+                        <div class="text-[8px] text-slate-500 mt-0.5">Masuk: ${escapeHtml(p.timestamp || '-')}</div>
+                        ${(p.status === 'completed' && p.completedTimestamp) ? `<div class="text-[8px] text-emerald-700 font-semibold">Selesai: ${escapeHtml(p.completedTimestamp)}</div>` : ''}
                     </td>
-                    <td class="p-2 uppercase font-semibold">${p.source || '-'}</td>
-                    <td class="p-2">
-                        <strong>${p.recipient || '-'}</strong>
-                        <div class="text-rose-600 text-[8px] font-semibold">${p.destination || '-'}</div>
+                    <td class="p-2 min-w-[120px]">
+                        <span class="px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 font-bold uppercase text-[7.5px]">${escapeHtml(p.source || '-')}</span>
+                        <div class="text-[8.5px] font-semibold text-slate-700 mt-0.5 break-words">${srcDetail}</div>
+                        <div class="text-[8px] text-purple-700 font-bold uppercase mt-0.5">Kat: ${escapeHtml(p.category || '-')}</div>
                     </td>
-                    <td class="p-2">P: ${p.petugas || '-'}<br>K: <strong>${p.courier || '-'}</strong></td>
+                    <td class="p-2 min-w-[160px]">
+                        <div class="font-bold text-slate-900 break-words">${escapeHtml(p.recipient || '-')} <span class="text-slate-500 font-normal">(${escapeHtml(p.role || '-')})</span></div>
+                        <div class="text-rose-600 text-[8.5px] font-bold break-words"><i class="fa-solid fa-location-dot mr-0.5"></i>${escapeHtml(p.destination || '-')}</div>
+                        <div class="text-emerald-700 text-[8px] font-mono break-words"><i class="fa-brands fa-whatsapp mr-0.5"></i>${maskPhoneNumber(p.phone)} <span class="text-amber-700 font-bold ml-1">[PIN: ${escapeHtml(getOrCreatePackagePin(p))}]</span></div>
+                        ${p.notes && p.notes !== '-' ? `<div class="text-[8px] text-slate-600 bg-slate-100 p-1 rounded mt-0.5 break-words"><strong>Catatan:</strong> ${escapeHtml(p.notes)}</div>` : ''}
+                    </td>
+                    <td class="p-2 min-w-[130px] text-[8.5px]">
+                        <div class="break-words"><span class="text-slate-400">Petugas:</span> <strong class="text-slate-800">${escapeHtml(p.petugas || '-')}</strong></div>
+                        <div class="break-words mt-0.5"><span class="text-slate-400">Kurir:</span> <strong class="text-sky-700">${escapeHtml(p.courier || '-')}</strong></div>
+                        ${(p.status === 'completed' && p.completionOption) ? `<div class="text-[8px] text-emerald-700 font-semibold mt-0.5 break-words">${escapeHtml(p.completionOption)}</div>` : ''}
+                    </td>
                     <td class="p-2">
                         <div class="flex items-center space-x-1">
-                            ${p.physicalPhotoUrl ? `<img src="${p.physicalPhotoUrl}" title="Foto Awal" class="w-7 h-7 object-cover rounded border zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
-                            ${p.proofPhotoUrl ? `<img src="${p.proofPhotoUrl}" title="Foto Bukti Kurir" class="w-7 h-7 object-cover rounded border border-emerald-400 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
-                            ${p.signatureDataUrl ? `<img src="${p.signatureDataUrl}" title="TTD Penerima" class="w-7 h-7 object-contain bg-white rounded border border-indigo-300 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                            ${p.physicalPhotoUrl ? `<img src="${sanitizeImageUrl(p.physicalPhotoUrl)}" title="Foto Awal" class="w-7 h-7 object-cover rounded border zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                            ${p.proofPhotoUrl ? `<img src="${sanitizeImageUrl(p.proofPhotoUrl)}" title="Foto Bukti Kurir" class="w-7 h-7 object-cover rounded border border-emerald-400 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
+                            ${p.signatureDataUrl ? `<img src="${sanitizeImageUrl(p.signatureDataUrl)}" title="TTD Penerima" class="w-7 h-7 object-contain bg-white rounded border border-indigo-300 zoomable-img" onclick="window.openZoomModal(this.src)">` : ''}
                         </div>
                     </td>
-                    <td class="p-2">
-                        <div class="font-bold uppercase text-[8px] mb-0.5">${p.status || '-'}</div>
+                    <td class="p-2 min-w-[115px]">
+                        <div class="font-bold uppercase text-[8px] mb-0.5">${escapeHtml(p.status || '-')}</div>
+                        <div class="text-[8px] text-slate-500 mb-0.5 break-words">SLA: ${escapeHtml(p.sla || '-')}</div>
                         ${window.getSlaBadgeHtml(p)}
                     </td>
                     <td class="p-2 text-right whitespace-nowrap space-x-1">
@@ -3162,7 +4063,7 @@
                 const entries = Object.entries(officerMap).sort((a,b) => b[1] - a[1]);
                 offEl.innerHTML = entries.map(([name, cnt]) => `
                     <div class="p-2 rounded-xl bg-white border flex justify-between items-center text-[9px]">
-                        <span class="font-bold text-slate-700">${name}</span>
+                        <span class="font-bold text-slate-700">${escapeHtml(name)}</span>
                         <span class="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-extrabold">${cnt} Paket Diinput</span>
                     </div>
                 `).join('') || `<div class="text-center py-4 text-slate-400 text-[9px]">Tidak ada data pada periode ini.</div>`;
@@ -3173,7 +4074,7 @@
                 const entries = Object.entries(courierMap).sort((a,b) => b[1].completed - a[1].completed);
                 couEl.innerHTML = entries.map(([name, st]) => `
                     <div class="p-2 rounded-xl bg-white border flex justify-between items-center text-[9px]">
-                        <span class="font-bold text-slate-700">${name}</span>
+                        <span class="font-bold text-slate-700">${escapeHtml(name)}</span>
                         <div class="space-x-1">
                             <span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 font-bold">Total: ${st.total}</span>
                             <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-extrabold">Selesai: ${st.completed}</span>
@@ -3193,13 +4094,13 @@
                 return `
                 <tr class="hover:bg-slate-50 transition">
                     <td class="p-2">
-                        <div class="font-bold text-slate-800">${m.name}</div>
-                        <div class="font-mono text-[8px] text-indigo-600">@${uname}</div>
+                        <div class="font-bold text-slate-800">${escapeHtml(m.name)}</div>
+                        <div class="font-mono text-[8px] text-indigo-600">@${escapeHtml(uname)}</div>
                     </td>
-                    <td class="p-2 uppercase font-bold text-[8px]">${m.role}</td>
+                    <td class="p-2 uppercase font-bold text-[8px]">${escapeHtml(m.role)}</td>
                     <td class="p-2">
                         <button type="button" onclick="window.toggleMemberStatus('${safeId}')" class="px-2.5 py-0.5 rounded-full text-[8px] font-extrabold transition ${isOff ? 'bg-rose-100 text-rose-700 border border-rose-300' : 'bg-emerald-100 text-emerald-700 border border-emerald-300'}" title="Klik untuk Aktifkan / Nonaktifkan Sementara">
-                            <i class="fa-solid ${isOff ? 'fa-ban' : 'fa-circle-check'} mr-0.5"></i>${m.status || 'Aktif'}
+                            <i class="fa-solid ${isOff ? 'fa-ban' : 'fa-circle-check'} mr-0.5"></i>${escapeHtml(m.status || 'Aktif')}
                         </button>
                     </td>
                     <td class="p-2 text-right space-x-1">
@@ -3245,7 +4146,8 @@
             const editId = document.getElementById('member-edit-id').value;
             const name = document.getElementById('member-name').value.trim();
             const username = document.getElementById('member-email').value.trim().toLowerCase();
-            const password = document.getElementById('member-password').value;
+            const rawPassword = document.getElementById('member-password').value;
+            const password = await hashPasswordSha256(rawPassword);
             const role = document.getElementById('member-role').value;
 
             let m = editId ? members.find(item => String(item.id) === String(editId)) : null;
@@ -3267,8 +4169,9 @@
             if (!m) return;
             window.openCustomConfirm('Hapus Anggota', `Yakin ingin menghapus akun ${m.name}?`, async () => {
                 members = members.filter(item => String(item.id) !== String(id));
+                saveLocalCache();
                 if (db) {
-                    try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'members_col', String(id))); } catch (e) {}
+                    try { deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'members_col', String(id))).catch(() => {}); } catch (e) {}
                 }
                 updateCourierAndRecipientDropdowns();
                 renderAdminMembers();
@@ -3294,10 +4197,10 @@
             container.innerHTML = filtered.slice(0, 100).map(l => `
                 <div class="p-2 rounded-xl bg-slate-50 border flex justify-between items-center gap-2 text-[8.5px]">
                     <div>
-                        <span class="px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-700 font-extrabold uppercase mr-1">${l.role || 'SYS'}</span>
-                        <strong>${l.actor || 'Sistem'}:</strong> ${l.action}
+                        <span class="px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-700 font-extrabold uppercase mr-1">${escapeHtml(l.role || 'SYS')}</span>
+                        <strong>${escapeHtml(l.actor || 'Sistem')}:</strong> ${escapeHtml(l.action)}
                     </div>
-                    <span class="text-slate-400 font-mono shrink-0">${l.time || ''}</span>
+                    <span class="text-slate-400 font-mono shrink-0">${escapeHtml(l.time || '')}</span>
                 </div>
             `).join('') || `<div class="text-center py-6 text-slate-400 text-[9px]">Belum ada catatan aktivitas.</div>`;
         };
@@ -3313,10 +4216,11 @@
             window.openCustomConfirm('Bersihkan Audit Log', 'Hapus seluruh riwayat aktivitas dari tampilan?', async () => {
                 if (db) {
                     for (const l of auditLogs.slice(0, 100)) {
-                        try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'audit_logs_col', String(l.id))); } catch (e) {}
+                        try { deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'audit_logs_col', String(l.id))).catch(() => {}); } catch (e) {}
                     }
                 }
                 auditLogs = [];
+                saveLocalCache();
                 window.renderAuditLogs();
                 showToast('Audit log dibersihkan');
             });
@@ -3391,6 +4295,8 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            loadLocalCache();
+
             if (localStorage.getItem('kurir_bns_dark_mode') === '1') {
                 document.body.classList.add('dark-mode');
                 const icon = document.getElementById('dark-mode-icon');
